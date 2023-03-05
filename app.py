@@ -8,7 +8,7 @@ engine = Engine()
 
 @app.route("/")
 def index():
-    return "Hello World!"
+    return "Hello World!\n"
 
 
 @app.route("/test")
@@ -16,7 +16,7 @@ def test():
     start = time.time()
     status = engine.mock_request()
     end = time.time()
-    return "status: %s<br>invoke time: %ss" % (status, str(end - start))
+    return "status: %s\ninvoke time: %ss\n" % (status, str(end - start))
 
 
 @app.route("/model-a")
