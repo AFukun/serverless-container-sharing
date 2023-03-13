@@ -1,35 +1,28 @@
 import time
+import requests
 import docker
 
 
 class Engine:
     def __init__(self):
-        self.container = ""
-        self.client = docker.DockerClient(base_url="tcp://172.18.166.229:2375")
-
-    def handle_mock_request(self):
-        time.sleep(1)
-        policy = "warm"
-        if self.container == "":
-            self.container = "mock"
-            time.sleep(2)
-            policy = "cold"
-        return policy
+        self.client = docker.from_env()
+        self.container = None
 
     def handle_request(self, model_name):
-        try:
+        if self.container == None:
             self.container = self.client.containers.run(
-                "tensorflow-with-models", detach=True, tty=True
+                "tensorflow-with-functions",
+                volumes=["data:/data"],
+                ports={"5000/tcp": 5000},
+                detach=True,
             )
-            if model_name == "A":
-                output = self.container.exec_run(
-                    'python -c "from functions import *\nmodel = load_model_a()\nmodel = switch_to_model_b(model)"',
-                ).output.decode("utf-8")
-            if model_name == "B":
-                output = self.container.exec_run(
-                    'python -c "from functions import *\nmodel = load_model_b()\nmodel = switch_to_model_a(model)"',
-                ).output.decode("utf-8")
-        finally:
-            self.container.stop()
-            self.container.remove()
-        return output
+
+        status = 1
+        while status != 0:
+            try:
+                response = requests.get("http://localhost:5000/" + model_name)
+                status = 0
+            except:
+                status = 1
+
+        return response.text
