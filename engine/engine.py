@@ -5,7 +5,7 @@ import docker
 class Engine:
     def __init__(self):
         self.container = ""
-        self.client = docker.DockerClient(base_url="tcp://172.18.166.229:2375")
+        self.client = docker.DockerClient(base_url="tcp://blockchain2:2375")
 
     def handle_mock_request(self):
         time.sleep(1)
