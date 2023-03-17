@@ -1,3 +1,3 @@
-from engine import Engine
+import core
 
-Engine().deploy_models()
+core.deploy_models()
