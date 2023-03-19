@@ -27,3 +27,7 @@ class Engine:
                 status = 1
 
         return response.text
+
+    def remove_container(self):
+        self.container.stop()
+        self.container.remove()

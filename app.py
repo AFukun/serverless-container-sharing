@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, request
 import core
 import time
 
@@ -25,6 +25,12 @@ def b():
     output = engine.handle_request("b")
     end = time.time()
     return output + "invoke time: %ss\n" % str(end - start)
+
+
+@app.route("/remove-container")
+def remove_container():
+    engine.remove_container()
+    return "container removed\n"
 
 
 if __name__ == "__main__":
