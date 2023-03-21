@@ -1,9 +1,8 @@
 FROM tensorflow/tensorflow:latest
 
-COPY functions/ functions/
+COPY core/ core/
 COPY app.py .
 COPY requirements.txt .
-COPY elephant.jpg .
 RUN pip install -r requirements.txt
 
-CMD ["python", "app.py"]
+CMD ["python", "app.py","-D","/data/"]

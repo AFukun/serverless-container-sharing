@@ -42,8 +42,8 @@ def transform_by_tensor_info(tensor, childInfo):
         newTensorShape = childInfo[-1]
         resize_tensorflow(oldTensorShape, newTensorShape, tensor)
         tensor.filters = childInfo[1]
-        tensor.kernel_size = childInfo[2]
-        tensor.strides = childInfo[3]
+        tensor.kernel_size = tuple(childInfo[2])
+        tensor.strides = tuple(childInfo[3])
         tensor.padding = childInfo[4]
         tensor._name = childInfo[5]
         if childInfo[6] == "relu":
@@ -55,7 +55,6 @@ def transform_by_tensor_info(tensor, childInfo):
     elif _type == tf.keras.layers.Dense:
         oldTensorShape = tensor.weights[0].shape
         newTensorShape = childInfo[-1]
-
         resize_tensorflow(oldTensorShape, newTensorShape, tensor)
         tensor.units = childInfo[1]
         tensor._name = childInfo[2]
@@ -66,6 +65,6 @@ def transform_by_tensor_info(tensor, childInfo):
         tensor.input_spec.axes[-1] = childInfo[-1][0]
 
     elif _type == tf.keras.layers.MaxPool2D:
-        tensor.pool_size = childInfo[1]
-        tensor.strides = childInfo[2]
+        tensor.pool_size = tuple(childInfo[1])
+        tensor.strides = tuple(childInfo[2])
         tensor._name = childInfo[3]

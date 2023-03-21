@@ -1,7 +1,7 @@
 import tensorflow as tf
-from group_by_tensor_type import _group_by_tensor_type
-from options import args_parser
-from GED_Munkres import munkres
+from .group_by_tensor_type import _group_by_tensor_type
+from .options import args_parser
+from .GED_Munkres import munkres
 
 # two layers
 
