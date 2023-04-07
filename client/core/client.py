@@ -21,7 +21,7 @@ class Client:
                 detach=True,
             )
             self.container_port = 5000
-            status = "container cold start"
+            status = f"container cold start"
 
         response = None
         while response == None:

@@ -47,22 +47,21 @@ def swap_module(n, m, tempParentModel, solution):
     return childModel
 
 
-"""
-    childStructureInfo: List
-"""
-
-
 def transform(parentModel, childStructureInfo, solution, n, m):
     # step 1: transform by node
+    start = time.time()
     model = parentModel
     for _, layer in enumerate(model.layers):
         if solution[_][1] < m:
             transform_by_tensor_info(layer, childStructureInfo[solution[_][1]])
 
-    tempParentModel = model.layers[:]
+    end = time.time()
+    reshape_time = end - start
 
     # add_modules
 
+    start = time.time()
+    tempParentModel = model.layers[:]
     for _ in range(n, n + m):
         if solution[_][1] >= m:
             tempParentModel.append([])
@@ -98,7 +97,16 @@ def transform(parentModel, childStructureInfo, solution, n, m):
                 )
 
             tempParentModel.append(tensor)
-    # step 2: transform by edge
-    childModel = swap_module(n, m, tempParentModel, solution)
+    end = time.time()
+    add_and_fail_time = end - start
 
-    return childModel
+    # step 2: transform by edge
+    start = time.time()
+    childModel = swap_module(n, m, tempParentModel, solution)
+    end = time.time()
+    swap_time = end - start
+
+    return (
+        childModel,
+        f"(reshape in {reshape_time}s,add in {add_and_fail_time}s,swap in {swap_time}s",
+    )

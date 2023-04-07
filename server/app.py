@@ -1,3 +1,4 @@
+import time
 from argparse import ArgumentParser
 from flask import Flask, request
 
@@ -18,8 +19,10 @@ server = Server(args.data_dir)
 @app.route("/inference")
 def inference():
     args = request.args
+    start = time.time()
     status, result = server.inference(args.get("model-name"), args.get("input-file"))
-    return f"({status}, {result})"
+    end = time.time()
+    return f"({status}, {result}, {end - start}s)"
 
 
 if __name__ == "__main__":

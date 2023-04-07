@@ -134,8 +134,8 @@ class Munkres(object):
         Repeat for each element in the matrix. Go to Step 3.
         """
         zeros = self.matrix.zeros()
-        for (i, j) in zeros:
-            for (i1, j1) in self.starred:
+        for i, j in zeros:
+            for i1, j1 in self.starred:
                 if i1 == i or j1 == j:
                     break
             else:
@@ -148,7 +148,7 @@ class Munkres(object):
         the starred zeros describe a complete set of unique assignments.  In
         this case, Go to DONE, otherwise, Go to Step 4.
         """
-        for (_, j) in self.starred:
+        for _, j in self.starred:
             self.covered_columns[j] = True
         if sum(self.covered_columns) == self.matrix.K:
             return None
@@ -161,7 +161,7 @@ class Munkres(object):
         If there are no uncovered zeros, returns None
         """
         zeros = self.matrix.zeros()
-        for (i, j) in zeros:
+        for i, j in zeros:
             if not self.covered_columns[j] and not self.covered_rows[i]:
                 return (i, j)
         return None
