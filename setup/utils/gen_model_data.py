@@ -10,18 +10,18 @@ from tensorflow.keras.applications.inception_v3 import InceptionV3
 from tensorflow.keras.applications.mobilenet import MobileNet
 
 from .custom_models import VGG11
-from .build_cost_matrix import build_solution, build_child_info
+from .save_information import build_childmodel_info, compute_node_to_node_mapping
 
 model_name_list = [
-    "vgg11",
+    # "vgg11",
     "vgg16",
     "vgg19",
     "resnet50",
-    "resnet101",
-    "resnet152",
-    "densenet121",
-    "inceptionv3",
-    "mobilenet",
+    # "resnet101",
+    # "resnet152",
+    # "densenet121",
+    # "inceptionv3",
+    # "mobilenet",
 ]
 tf_applications = {
     "vgg11": VGG11,
@@ -45,19 +45,19 @@ def gen_model_data(data_dir):
             model.save(f"{data_dir}{model_name}.h5")
             model.save_weights(f"{data_dir}{model_name}_weights.h5")
             with open(f"{data_dir}{model_name}_info.json", "w") as outfile:
-                info = build_child_info(model)
+                info = build_childmodel_info(model)
                 json.dump(info, outfile)
+            models.append(model)
         else:
             models.append(load_model(f"{data_dir}{model_name}.h5"))
-    return models
 
-
-def gen_solutions(data_dir, models):
-    vgg16 = models[0]
-    vgg19 = models[1]
-    with open(data_dir + "vgg19_to_vgg16_solution.json", "w") as outfile:
-        solution = build_solution(vgg19, vgg16)
-        json.dump(solution, outfile)
-    with open(data_dir + "vgg16_to_vgg19_solution.json", "w") as outfile:
-        solution = build_solution(vgg16, vgg19)
-        json.dump(solution, outfile)
+    for model_a in models:
+        for model_b in models:
+            if model_a._name != model_b._name:
+                with open(
+                    f"{data_dir}{model_a._name}_to_{model_b._name}_solution.json", "w"
+                ) as outfile:
+                    node_to_node_mapping = compute_node_to_node_mapping(
+                        model_a, model_b
+                    )
+                    json.dump(node_to_node_mapping, outfile)
