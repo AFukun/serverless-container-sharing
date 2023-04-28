@@ -44,6 +44,7 @@ def switch_model(data_dir, parent_model, child_model_name):
 def _preprocess_image(image_path):
     img = image.load_img(image_path, target_size=(224, 224))
     img = image.img_to_array(img)
+
     return np.expand_dims(img, axis=0)
 
 

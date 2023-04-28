@@ -9,7 +9,8 @@ from tensorflow.keras.applications.densenet import DenseNet121
 from tensorflow.keras.applications.inception_v3 import InceptionV3
 from tensorflow.keras.applications.mobilenet import MobileNet
 
-from .custom_models import VGG11
+from models.vgg import VGG11
+
 from .save_information import build_childmodel_info, compute_node_to_node_mapping
 
 model_name_list = [
@@ -23,6 +24,7 @@ model_name_list = [
     # "inceptionv3",
     # "mobilenet",
 ]
+
 tf_applications = {
     "vgg11": VGG11,
     "vgg16": VGG16,

@@ -8,11 +8,11 @@ from core.api import *
 data_dir = "tmp/"
 input_file = "elephant.jpg"
 
-# start = time.time()
-# resnet50 = load_model(data_dir, "resnet50")
-# end = time.time()
-# print(inference(data_dir, resnet50, input_file))
-# print("resnet50 load time: ", end - start)
+start = time.time()
+resnet50 = load_model(data_dir, "resnet50")
+end = time.time()
+print(inference(data_dir, resnet50, input_file))
+print("resnet50 load time: ", end - start)
 
 resnet50 = load_model(data_dir, "resnet50")
 print(inference(data_dir, resnet50, input_file))
@@ -24,7 +24,7 @@ print("vgg16 load time: ", end - start)
 
 # vgg19 = load_model(data_dir, "vgg19")
 # start = time.time()
-# vgg16, _ = switch_model(data_dir, vgg19, "vgg16")
+# vgg16 = switch_model(data_dir, vgg19, "vgg16")
 # end = time.time()
 # print(inference(data_dir, vgg16, input_file))
 # print("vgg19 to vgg16 switch time: ", end - start)
