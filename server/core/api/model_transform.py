@@ -205,8 +205,8 @@ def transform_by_layer_info(layer, layer_info):
         layer.input_spec.axes[-1] = layer_info["layer_kernel_shape"][0]
     elif layer_type == tf.keras.layers.MaxPool2D:
         layer.name = layer_info["layer_name"]
-        layer.pool_size = layer_info["layer_pool_size"]
-        layer.strides = layer_info["layer_strides"]
+        layer.pool_size = tuple(layer_info["layer_pool_size"])
+        layer.strides = tuple(layer_info["layer_strides"])
     elif layer_type == tf.compat.v1.keras.layers.BatchNormalization:
         old_layer_shape = layer.beta.shape
         new_layer_shape = layer_info["layer_beta_shape"]
@@ -230,8 +230,8 @@ def transform_by_layer_info(layer, layer_info):
         layer.activation = activations.get(layer_info["layer_activation_name"])
     elif layer_type == tf.keras.layers.AveragePooling2D:
         layer.name = layer_info["layer_name"]
-        layer.pool_size = layer_info["layer_pool_size"]
-        layer.strides = layer_info["layer_strides"]
+        layer.pool_size = tuple(layer_info["layer_pool_size"])
+        layer.strides = tuple(layer_info["layer_strides"])
         layer.padding = layer_info["layer_padding"]
     elif layer_type == tf.keras.layers.DepthwiseConv2D:
         old_layer_shape = layer.depthwise_kernel.shape
@@ -335,14 +335,14 @@ def model_structure_transformation(parentModel, childmodel_info, node_to_node_ma
             elif layer_info["layer_type"] == "MaxPool2D":
                 layer = MaxPool2D(
                     name=layer_info["layer_name"],
-                    pool_size=layer_info["layer_pool_size"],
-                    strides=layer_info["layer_strides"],
+                    pool_size=tuple(layer_info["layer_pool_size"]),
+                    strides=tuple(layer_info["layer_strides"]),
                 )
             elif layer_info["layer_type"] == "AveragePooling2D":
                 layer = AveragePooling2D(
                     name=layer_info["layer_name"],
-                    pool_size=layer_info["layer_pool_size"],
-                    strides=layer_info["layer_strides"],
+                    pool_size=tuple(layer_info["layer_pool_size"]),
+                    strides=tuple(layer_info["layer_strides"]),
                     padding=layer_info["layer_padding"],
                 )
             elif layer_info["layer_type"] == "BatchNormalization":

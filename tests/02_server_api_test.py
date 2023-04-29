@@ -28,13 +28,13 @@ print("vgg16 load time: ", end - start)
 # end = time.time()
 # print(inference(data_dir, vgg16, input_file))
 # print("vgg19 to vgg16 switch time: ", end - start)
-
+#
 # start = time.time()
 # vgg19 = load_model(data_dir, "vgg19")
 # end = time.time()
 # print(inference(data_dir, vgg19, input_file))
 # print("vgg19 load time: ", end - start)
-
+#
 # vgg16 = load_model(data_dir, "vgg16")
 # start = time.time()
 # vgg19, _ = switch_model(data_dir, vgg16, "vgg19")
