@@ -26,11 +26,10 @@ def deploy_models():
     client = docker.DockerClient(base_url=HOST_URL)
     _, logs = client.images.build(rm=True, path="setup", tag="setup")
     _print_logs(logs)
-    client.volumes.create(name="data")
     print(
         client.containers.run(
             "setup",
-            command="python setup.py",
+            command="python setup.py -D /data/",
             volumes=["data:/data"],
             auto_remove=True,
         ).decode("utf-8")

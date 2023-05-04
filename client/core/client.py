@@ -15,8 +15,9 @@ class Client:
         status = "reuse container"
         if self.container == None:
             self.container = self.client.containers.run(
-                "tensorflow-with-functions",
+                "server",
                 volumes=["data:/data"],
+                command="python app.py -D /data/",
                 ports={"5000/tcp": 5000},
                 detach=True,
             )
