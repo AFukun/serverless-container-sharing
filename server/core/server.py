@@ -14,18 +14,9 @@ class Server:
             if self.model._name == model_name:
                 api.load_weights(self.data_dir, self.model)
                 return f"load {model_name} weights"
-            if (
-                self.model._name == "resnet50"
-                or model_name == "resnet50"
-                or self.model._name == "mobilenet"
-                or model_name == "model_name"
-            ):
-                self.model = api.load_model(self.data_dir, model_name)
-                return f"load {model_name}"
-            self.model, switch_log = api.switch_model(
-                self.data_dir, self.model, model_name
-            )
-            return f"switch to {model_name}[{switch_log}]"
+            else:
+                api.switch_model(self.data_dir, self.model, model_name)
+                return f"switch to {model_name}"
         else:
             self.model = api.load_model(self.data_dir, model_name)
             return f"load {model_name}"
