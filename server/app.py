@@ -20,7 +20,7 @@ server = Server(args.data_dir)
 def inference():
     args = request.args
     start = time.time()
-    status, result = server.inference(args.get("model-name"), args.get("input-file"))
+    status, result = server.inference(args.get("model-name"))
     end = time.time()
     return f"({status}, {result}, {end - start}s)"
 

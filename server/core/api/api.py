@@ -1,13 +1,8 @@
 import time
 import json
 import numpy as np
-
+import tensorflow as tf
 from tensorflow.keras.models import load_model as tensorflow_load_model
-from tensorflow.keras.applications.imagenet_utils import (
-    preprocess_input,
-    decode_predictions,
-)
-from tensorflow.keras.preprocessing import image
 
 from .model_transform import model_structure_transformation
 
@@ -41,17 +36,14 @@ def switch_model(data_dir, parent_model, child_model_name):
     return child_model
 
 
-def _preprocess_image(image_path):
-    img = image.load_img(image_path, target_size=(224, 224))
-    img = image.img_to_array(img)
+def generate_random_input(model):
+    shape = list(model.layers[0].input_shape[0])
+    shape[0] = 1
 
-    return np.expand_dims(img, axis=0)
+    return tf.random.normal(shape)
 
 
-def inference(data_dir, model, input_file):
-    img = _preprocess_image(data_dir + input_file)
-    input = preprocess_input(img)
-    predicts = model.predict(input)
-    output = decode_predictions(predicts, top=1)[0]
+def inference(model, input):
+    output = model(input).numpy()[0]
 
-    return output
+    return np.max(output)

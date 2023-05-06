@@ -11,4 +11,3 @@ args = parser.parse_args()
 
 if __name__ == "__main__":
     utils.gen_model_data(args.data_dir)
-    utils.copy_samples(args.data_dir)

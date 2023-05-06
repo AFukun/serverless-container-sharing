@@ -5,13 +5,13 @@ import docker
 HOST_URL = "ssh://luosf@blockchain2"
 
 model_name_list = [
-    "mobilenet",
-    "vgg11",
+    # "mobilenet",
+    # "vgg11",
     "vgg16",
     "vgg19",
     "resnet50",
-    "resnet101",
-    "resnet152",
+    # "resnet101",
+    # "resnet152",
 ]
 
 client = docker.DockerClient(base_url=HOST_URL)
