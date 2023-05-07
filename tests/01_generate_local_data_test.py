@@ -6,4 +6,5 @@ import utils
 
 os.chdir("setup")
 data_dir = "../tmp/"
-utils.gen_model_data(data_dir)
+model_name_list = ["resnet50", "vgg16", "vgg19"]
+utils.gen_model_data(data_dir, model_name_list)
