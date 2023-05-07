@@ -15,7 +15,6 @@ print(inference(resnet50, input))
 print("resnet50 load time: ", end - start)
 
 vgg16 = load_model(data_dir, "vgg16")
-print(vgg16.summary())
 print(inference(vgg16, input))
 start = time.time()
 vgg16 = switch_model(data_dir, resnet50, "vgg16")
