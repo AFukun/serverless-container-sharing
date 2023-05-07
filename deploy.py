@@ -1,6 +1,7 @@
 import docker
 
 HOST_URL = "ssh://luosf@blockchain2"
+REFRESH_VOLUME = False
 
 
 def _print_logs(logs):
@@ -26,14 +27,22 @@ def deploy_models():
     client = docker.DockerClient(base_url=HOST_URL)
     _, logs = client.images.build(rm=True, path="setup", tag="setup")
     _print_logs(logs)
-    print(
-        client.containers.run(
-            "setup",
-            command="python setup.py -D /data/",
-            volumes=["data:/data"],
-            auto_remove=True,
-        ).decode("utf-8")
+
+    if REFRESH_VOLUME:
+        client.volumes.get("data").remove()
+        client.volumes.create("data")
+
+    container = client.containers.create(
+        "setup",
+        command="python setup.py -D /data/",
+        volumes=["data:/data"],
     )
+    try:
+        container.start()
+        container.wait()
+    finally:
+        print(container.logs().decode())
+        container.remove()
 
 
 if __name__ == "__main__":

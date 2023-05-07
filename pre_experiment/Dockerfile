@@ -1,7 +1,4 @@
-FROM tensorflow/tensorflow:latest
+FROM tensorflow/tensorflow:2.0.0-py3
 
 COPY utils/ utils/
 COPY main.py .
-
-COPY requirements.txt .
-RUN pip install -r requirements.txt

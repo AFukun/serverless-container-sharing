@@ -7,6 +7,10 @@ class Server:
     def __init__(self, data_dir):
         self.data_dir = data_dir
         self.model = None
+        self.input = None
+
+    def _set_input(self):
+        self.input = api.generate_random_input(self.model)
 
     def _setup_model(self, model_name):
         # temp logic
@@ -16,15 +20,17 @@ class Server:
                 return f"load {model_name} weights"
             else:
                 api.switch_model(self.data_dir, self.model, model_name)
+                self._set_input()
                 return f"switch to {model_name}"
         else:
             self.model = api.load_model(self.data_dir, model_name)
+            self._set_input()
             return f"load {model_name}"
 
-    def inference(self, model_name, input_file):
+    def inference(self, model_name):
         status = self._setup_model(model_name)
         start = time.time()
-        result = api.inference(self.data_dir, self.model, input_file)
+        result = api.inference(self.model, self.input)
         end = time.time()
 
         return status, f"{result} in {end - start}s"

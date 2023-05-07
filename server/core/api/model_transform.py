@@ -252,7 +252,7 @@ def transform_by_layer_info(layer, layer_info):
             layer.max_value = K.cast_to_floatx(max_value)
     elif layer_type == tf.keras.layers.Reshape:
         layer.name = layer_info["layer_name"]
-        layer.target_shape = layer_info["layer_target_shape"]
+        layer.target_shape = tuple(layer_info["layer_target_shape"])
     elif layer_type == tf.keras.layers.Dropout:
         layer.name = layer_info["layer_name"]
         layer.rate = layer_info["layer_rate"]

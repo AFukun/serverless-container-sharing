@@ -20,18 +20,20 @@ client = Client("ssh://luosf@blockchain2")
 # print("invoke time: " + str(end - start))
 
 start = time.time()
-print(client.inference("resnet50", "elephant.jpg"))
+print(client.inference("resnet50"))
 end = time.time()
 print("invoke time: " + str(end - start))
 
 start = time.time()
-print(client.inference("vgg16", "elephant.jpg"))
+print(client.inference("vgg16"))
 end = time.time()
 print("invoke time: " + str(end - start))
 
 start = time.time()
-print(client.inference("vgg19", "elephant.jpg"))
+print(client.inference("vgg19"))
 end = time.time()
 print("invoke time: " + str(end - start))
 
-# client.reset()
+client.print_logs()
+
+client.reset()

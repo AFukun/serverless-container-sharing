@@ -16,7 +16,7 @@ def index():
 def inference():
     args = request.args
     start = time.time()
-    status, response = client.inference(args.get("model-name"), args.get("input-file"))
+    status, response = client.inference(args.get("model-name"))
     end = time.time()
     return f"container status: {status}\nserver response: {response}\ninvoke time: {end - start}"
 

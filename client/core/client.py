@@ -11,7 +11,7 @@ class Client:
         self.container = None
         self.container_port = None
 
-    def inference(self, model_name, input_file):
+    def inference(self, model_name):
         status = "reuse container"
         if self.container == None:
             self.container = self.client.containers.run(
@@ -29,12 +29,15 @@ class Client:
             try:
                 response = requests.get(
                     f"http://{self.host}:{self.container_port}/inference",
-                    params={"model-name": model_name, "input-file": input_file},
+                    params={"model-name": model_name},
                 )
             except:
                 response = None
 
         return status, response.text
+
+    def print_logs(self):
+        print(self.container.logs().decode())
 
     def reset(self):
         try:
