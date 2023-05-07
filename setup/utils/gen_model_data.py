@@ -31,7 +31,7 @@ tf_applications = {
     "mobilenet": MobileNet,
 }
 
-# TF_NATIVE = True
+TF_NATIVE = False
 
 
 def gen_model_data(data_dir, model_name_list):

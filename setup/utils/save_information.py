@@ -179,7 +179,7 @@ def build_childmodel_info(childmodel):
         elif layer_type == tf.keras.layers.Activation:
             layer_info["layer_type"] = "Activation"
             layer_info["layer_name"] = layer.name
-            # layer_info["layer_activation_name"] = layer.activation_name
+            layer_info["layer_activation_name"] = layer.activation_name
         elif layer_type == tf.keras.layers.GlobalAveragePooling2D:
             layer_info["layer_type"] = "GlobalAveragePooling2D"
             layer_info["layer_name"] = layer.name
