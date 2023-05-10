@@ -1,0 +1,8 @@
+[
+  "isqrtcovresnet18",
+  "isqrtcovresnet34",
+  "isqrtcovresnet50",
+  "isqrtcovresnet50b",
+  "isqrtcovresnet101",
+  "isqrtcovresnet101b"
+]

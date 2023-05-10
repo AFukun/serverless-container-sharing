@@ -1,5 +1,4 @@
 import time
-import tensorflow as tf
 import sys
 
 sys.path.insert(1, "server")
@@ -7,37 +6,32 @@ from core.api import *
 
 data_dir = "./tmp/"
 
-start = time.time()
-resnet50 = load_model(data_dir, "resnet50")
-end = time.time()
-input = generate_random_input(resnet50)
-print(inference(resnet50, input))
-print("resnet50 load time: ", end - start)
+test_model_list = [
+    "resnet18",
+    "resnet34",
+    "resnet50",
+    "vgg11",
+    "vgg16",
+    "vgg19",
+]
 
-vgg16 = load_model(data_dir, "vgg16")
-print(inference(vgg16, input))
-start = time.time()
-vgg16 = switch_model(data_dir, resnet50, "vgg16")
-end = time.time()
-print(inference(vgg16, input))
-print("vgg16 switch time: ", end - start)
+input = None
 
-# vgg19 = load_model(data_dir, "vgg19")
-# start = time.time()
-# vgg16 = switch_model(data_dir, vgg19, "vgg16")
-# end = time.time()
-# print(inference(data_dir, vgg16, input_file))
-# print("vgg19 to vgg16 switch time: ", end - start)
-#
-# start = time.time()
-# vgg19 = load_model(data_dir, "vgg19")
-# end = time.time()
-# print(inference(data_dir, vgg19, input_file))
-# print("vgg19 load time: ", end - start)
-#
-# vgg16 = load_model(data_dir, "vgg16")
-# start = time.time()
-# vgg19, _ = switch_model(data_dir, vgg16, "vgg19")
-# end = time.time()
-# print(inference(data_dir, vgg19, input_file))
-# print("vgg16 to vgg19 switch time: ", end - start)
+for model_a_name in test_model_list:
+    for model_b_name in test_model_list:
+        model_a = load_model(data_dir, model_a_name)
+        if input is None:
+            input = generate_random_input(model_a)
+        print(f"{model_a_name} result:", inference(model_a, input))
+        start = time.time()
+        if model_a_name == model_b_name:
+            # load_weights(data_dir, model_a)
+            end = time.time()
+            result = inference(model_a, input)
+            print(f"{model_a_name} result:", result)
+        else:
+            model_b = switch_model(data_dir, model_a, model_b_name)
+            end = time.time()
+            result = inference(model_b, input)
+        print(f"{model_b_name} result:", result)
+        print(f"switch time: {end - start}s")

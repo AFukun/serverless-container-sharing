@@ -31,14 +31,12 @@ tf_applications = {
     "mobilenet": MobileNet,
 }
 
-TF_NATIVE = False
 
-
-def gen_model_data(data_dir, model_name_list):
+def gen_model_data(data_dir, model_name_list, use_tf_native_app=False):
     models = []
     for model_name in model_name_list:
         if not exists(f"{data_dir}{model_name}.h5"):
-            if TF_NATIVE:
+            if use_tf_native_app:
                 model = tf_applications[model_name]()
             else:
                 pt_model = get_model(model_name)
@@ -64,10 +62,14 @@ def gen_model_data(data_dir, model_name_list):
     for model_a in models:
         for model_b in models:
             if model_a._name != model_b._name:
-                with open(
-                    f"{data_dir}{model_a._name}_to_{model_b._name}_solution.json", "w"
-                ) as outfile:
-                    node_to_node_mapping = compute_node_to_node_mapping(
-                        model_a, model_b
-                    )
-                    json.dump(node_to_node_mapping, outfile)
+                if not exists(
+                    f"{data_dir}{model_a._name}_to_{model_b._name}_solution.json"
+                ):
+                    with open(
+                        f"{data_dir}{model_a._name}_to_{model_b._name}_solution.json",
+                        "w",
+                    ) as outfile:
+                        node_to_node_mapping = compute_node_to_node_mapping(
+                            model_a, model_b
+                        )
+                        json.dump(node_to_node_mapping, outfile)
