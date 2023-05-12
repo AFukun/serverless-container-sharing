@@ -287,7 +287,7 @@ def swap_node_location(parentmodel_layers, node_to_node_mapping, model_info, mod
     return childmodel
 
 
-def model_structure_transformation(parentModel, childmodel_info, node_to_node_mapping):
+def slow_model_structure_transformation(parentModel, childmodel_info, node_to_node_mapping):
     # step 1: transform by node
     parentmodel_layers_length = len(parentModel.layers)
     childmodel_layers_length = len(childmodel_info)
@@ -403,3 +403,128 @@ def model_structure_transformation(parentModel, childmodel_info, node_to_node_ma
     # step3: load childModel weights
     # childModel.load_weights(r'model_data/save_weights.h5')
     return childModel
+
+
+
+def fast_swap_node_location(parentmodel_layers, node_to_node_mapping, model_info, model, parentmodel_layers_length):
+    child_layers_length = len(model_info)
+    child_layers = [[] for _ in range(child_layers_length)]
+    Add_index = 0
+    for _, mapping in enumerate(node_to_node_mapping):
+        if mapping[1] < child_layers_length:
+            if mapping[0] < parentmodel_layers_length:
+                child_layers[mapping[1]] = parentmodel_layers[mapping[0]]
+            else:
+                child_layers[mapping[1]] = parentmodel_layers[parentmodel_layers_length + Add_index]
+                Add_index += 1
+    childmodel = generate_edge(model, child_layers, model_info)
+    return childmodel
+
+def model_structure_transformation(parentModel, childmodel_info, node_to_node_mapping):
+    # step 1: transform by node
+    parentmodel_layers_length = len(parentModel.layers)
+    childmodel_layers_length = len(childmodel_info)
+    model = parentModel
+    parentmodel_layers = model.layers[:]
+    for _, mapping in enumerate(node_to_node_mapping):
+        if mapping[0] < parentmodel_layers_length and mapping[1] < childmodel_layers_length:
+            transform_by_layer_info(model.layers[mapping[0]], childmodel_info[mapping[1]])
+        elif mapping[0] > parentmodel_layers_length:
+            layer_info = childmodel_info[node_to_node_mapping[_][1]]
+            if layer_info["layer_type"] == "InputLayer":
+                layer = InputLayer(
+                    input_shape=(
+                        224,
+                        224,
+                        3,
+                    ),
+                    name="input_1",
+                )
+            elif layer_info["layer_type"] == "Flatten":
+                layer = Flatten()
+            elif layer_info["layer_type"] == "Conv2D":
+                layer = Conv2D(
+                    name=layer_info["layer_name"],
+                    filters=layer_info["layer_filters"],
+                    kernel_size=layer_info["layer_kernel_size"],
+                    strides=layer_info["layer_strides"],
+                    padding=layer_info["layer_padding"],
+                    activation=layer_info["layer_activation_name"],
+                    use_bias=layer_info["layer_use_bias"],
+                )
+            elif layer_info["layer_type"] == "Dense":
+                layer = Dense(
+                    name=layer_info["layer_name"],
+                    units=layer_info["layer_units"],
+                    activation=layer_info["layer_activation_name"],
+                )
+            elif layer_info["layer_type"] == "MaxPool2D":
+                layer = MaxPool2D(
+                    name=layer_info["layer_name"],
+                    pool_size=tuple(layer_info["layer_pool_size"]),
+                    strides=tuple(layer_info["layer_strides"]),
+                )
+            elif layer_info["layer_type"] == "AveragePooling2D":
+                layer = AveragePooling2D(
+                    name=layer_info["layer_name"],
+                    pool_size=tuple(layer_info["layer_pool_size"]),
+                    strides=tuple(layer_info["layer_strides"]),
+                    padding=layer_info["layer_padding"],
+                )
+            elif layer_info["layer_type"] == "BatchNormalization":
+                layer = tf.compat.v1.keras.layers.BatchNormalization(
+                    name=layer_info["layer_name"],
+                    axis=layer_info["layer_axis"],
+                    scale=layer_info["layer_scale"],
+                    epsilon=layer_info["layer_epsilon"],
+                )
+            elif layer_info["layer_type"] == "Add":
+                layer = Add(name=layer_info["layer_name"])
+            elif layer_info["layer_type"] == "ZeroPadding2D":
+                layer = ZeroPadding2D(
+                    name=layer_info["layer_name"], padding=layer_info["layer_padding"]
+                )
+            elif layer_info["layer_type"] == "Activation":
+                layer = Activation(
+                    layer_info["layer_activation_name"], name=layer_info["layer_name"]
+                )
+            elif layer_info["layer_type"] == "GlobalAveragePooling2D":
+                layer = GlobalAveragePooling2D(name=layer_info["layer_name"])
+            elif layer_info["layer_type"] == "Concatenate":
+                layer = tf.compat.v1.keras.layers.Concatenate(
+                    name=layer_info["layer_name"], axis=layer_info["layer_axis"]
+                )
+            elif layer_info["layer_type"] == "DepthwiseConv2D":
+                layer = DepthwiseConv2D(
+                    name=layer_info["layer_name"],
+                    kernel_size=layer_info["layer_kernel_size"],
+                    padding=layer_info["layer_padding"],
+                    depth_multiplier=layer_info["depth_multiplier"],
+                    strides=layer_info["layer_strides"],
+                    use_bias=layer_info["layer_use_bias"],
+                )
+            elif layer_info["layer_type"] == "ReLU":
+                layer = ReLU(
+                    name=layer_info["layer_name"],
+                    max_value=layer_info["layer_max_value"],
+                )
+            elif layer_info["layer_type"] == "Reshape":
+                layer = Reshape(
+                    name=layer_info["layer_name"],
+                    target_shape=layer_info["layer_target_shape"],
+                )
+            elif layer_info["layer_type"] == "Dropout":
+                layer = Dropout(
+                    name=layer_info["layer_name"], rate=layer_info["layer_rate"]
+                )
+            else:
+                raise Exception("This type has not been added")
+            parentmodel_layers.append(layer)
+
+    # step 2: transformation by edge
+    childModel = fast_swap_node_location(parentmodel_layers, node_to_node_mapping, childmodel_info, model, parentmodel_layers_length)
+
+    # # step3: load childModel weights
+    # childModel.load_weights(r'model_data/save_weights.h5')
+    return childModel
+
