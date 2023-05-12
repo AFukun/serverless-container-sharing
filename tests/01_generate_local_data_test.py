@@ -1,12 +1,13 @@
 import sys
 
 sys.path.insert(1, "setup")
+import os
 import shutil
 import json
 import utils
 
 
-data_dir = "./tmp/"
+data_dir = "tmp/"
 # shutil.rmtree(data_dir)
 # os.mkdir(data_dir)
 
