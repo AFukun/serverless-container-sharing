@@ -19,7 +19,7 @@ sys.path.insert(1, "setup")
 from utils import *
 
 model_name_list = []
-with open("setup/pt_models.json") as file:
+with open("setup/local_test_models.json") as file:
     model_name_list = json.load(file)
 
 

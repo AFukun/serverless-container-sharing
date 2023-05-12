@@ -3,35 +3,36 @@ import sys
 
 sys.path.insert(1, "server")
 from core.api import *
+from prettytable import PrettyTable
 
 data_dir = "./tmp/"
 
-test_model_list = [
-    "resnet18",
-    "resnet34",
-    "resnet50",
-    "vgg11",
-    "vgg16",
-    "vgg19",
-]
+with open("tests/local_test_models.json") as file:
+    test_model_list = json.load(file)
 
-input = None
-
+table = PrettyTable([""] + test_model_list)
 for model_a_name in test_model_list:
+    row = [model_a_name]
     for model_b_name in test_model_list:
         model_a = load_model(data_dir, model_a_name)
         if input is None:
             input = generate_random_input(model_a)
-        print(f"{model_a_name} result:", inference(model_a, input))
         start = time.time()
         if model_a_name == model_b_name:
-            # load_weights(data_dir, model_a)
-            end = time.time()
-            result = inference(model_a, input)
-            print(f"{model_a_name} result:", result)
+            load_weights(data_dir, model_a)
         else:
             model_b = switch_model(data_dir, model_a, model_b_name)
-            end = time.time()
-            result = inference(model_b, input)
-        print(f"{model_b_name} result:", result)
-        print(f"switch time: {end - start}s")
+        end = time.time()
+        row.append("{:.2f}".format(end - start))
+    table.add_row(row)
+print(table)
+
+table = PrettyTable(test_model_list)
+row = []
+for model_name in test_model_list:
+    start = time.time()
+    model = load_model(data_dir, model_name)
+    end = time.time()
+    row.append("{:.2f}".format(end - start))
+table.add_row(row)
+print(table)

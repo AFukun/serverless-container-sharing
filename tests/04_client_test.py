@@ -9,16 +9,6 @@ from core import Client
 client = Client("ssh://luosf@blockchain2")
 
 
-# start = time.time()
-# print(client.inference("vgg19", "elephant.jpg"))
-# end = time.time()
-# print("invoke time: " + str(end - start))
-
-# start = time.time()
-# print(client.inference("vgg19", "elephant.jpg"))
-# end = time.time()
-# print("invoke time: " + str(end - start))
-
 start = time.time()
 print(client.inference("resnet50"))
 end = time.time()
