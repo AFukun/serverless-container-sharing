@@ -59,6 +59,9 @@ def gen_model_data(data_dir, model_name_list, use_tf_native_app=False):
         else:
             models.append(load_model(f"{data_dir}{model_name}.h5"))
 
+    generated_solution_count = 0
+    total_solution_count = len(models) * (len(models) - 1)
+
     for model_a in models:
         for model_b in models:
             if model_a._name != model_b._name:
@@ -73,3 +76,7 @@ def gen_model_data(data_dir, model_name_list, use_tf_native_app=False):
                             model_a, model_b
                         )
                         json.dump(node_to_node_mapping, outfile)
+                generated_solution_count = generated_solution_count + 1
+                print(
+                    f"{model_a._name} to {model_b.name}({generated_solution_count}/{total_solution_count})"
+                )

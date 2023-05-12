@@ -12,6 +12,16 @@ class Server:
     def _set_input(self):
         self.input = api.generate_random_input(self.model)
 
+    def manual_load_model(self, model_name):
+        self.model = None
+        self.model = api.load_model(self.data_dir, model_name)
+
+    def manual_switch_model(self, model_name):
+        if self.model._name == model_name:
+            api.load_weights(self.data_dir, self.model)
+        else:
+            api.switch_model(self.data_dir, self.model, model_name)
+
     def _setup_model(self, model_name):
         # temp logic
         if self.model != None:

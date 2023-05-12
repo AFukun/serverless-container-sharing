@@ -14,5 +14,7 @@ COPY utils/ utils/
 COPY patch/ patch/
 COPY setup.py .
 
-RUN cp "patch/reshape_layers.py"    "/usr/local/lib/python3.7/site-packages/onnx2keras"
-RUN cp "patch/core.py"              "/usr/local/lib/python3.7/site-packages/tensorflow_core/python/keras/layers"
+RUN cp "patch/reshape_layers.py"      "/usr/local/lib/python3.7/site-packages/onnx2keras"
+RUN cp "patch/converter.py"           "/usr/local/lib/python3.7/site-packages/onnx2keras"
+RUN cp "patch/operation_layers.py"    "/usr/local/lib/python3.7/site-packages/onnx2keras"
+RUN cp "patch/core.py"                "/usr/local/lib/python3.7/site-packages/tensorflow_core/python/keras/layers"

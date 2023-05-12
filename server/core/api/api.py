@@ -27,11 +27,9 @@ def switch_model(data_dir, parent_model, child_model_name):
     child_model = model_structure_transformation(
         parent_model, child_model_info, solution
     )
-    start = time.time()
     child_model._name = child_model_name
     load_weights(data_dir, child_model)
-    child_model.compile(loss="categorical_crossentropy")
-    end = time.time()
+    # child_model.compile(loss="categorical_crossentropy")
 
     return child_model
 

@@ -201,7 +201,9 @@ def build_childmodel_info(childmodel):
             layer_info["layer_strides"] = layer.strides
             layer_info["layer_padding"] = layer.padding
             layer_info["layer_use_bias"] = layer.use_bias
-            layer_info["layer_depthwise_kernel_shape"] = layer.depthwise_kernel.shape
+            layer_info[
+                "layer_depthwise_kernel_shape"
+            ] = layer.depthwise_kernel.shape.as_list()
         elif layer_type == tf.keras.layers.ReLU:
             layer_info["layer_type"] = "ReLU"
             layer_info["layer_name"] = layer.name

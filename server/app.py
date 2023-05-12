@@ -25,5 +25,23 @@ def inference():
     return f"({status}, {result}, {end - start}s)"
 
 
+@app.route("/manual/load-model")
+def manual_load_model():
+    args = request.args
+    start = time.time()
+    server.manual_load_model(args.get("model-name"))
+    end = time.time()
+    return "{:.2f}s".format(end - start)
+
+
+@app.route("/manual/switch-model")
+def manual_switch_model():
+    args = request.args
+    start = time.time()
+    server.manual_switch_model(args.get("model-name"))
+    end = time.time()
+    return "{:.2f}s".format(end - start)
+
+
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)
