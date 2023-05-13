@@ -16,6 +16,11 @@ app = Flask(__name__)
 server = Server(args.data_dir)
 
 
+@app.route("/greet")
+def greet():
+    return "ready to go"
+
+
 @app.route("/inference")
 def inference():
     args = request.args
@@ -31,7 +36,7 @@ def manual_load_model():
     start = time.time()
     server.manual_load_model(args.get("model-name"))
     end = time.time()
-    return "{:.2f}s".format(end - start)
+    return "{:.2f}".format(end - start)
 
 
 @app.route("/manual/switch-model")
@@ -40,7 +45,7 @@ def manual_switch_model():
     start = time.time()
     server.manual_switch_model(args.get("model-name"))
     end = time.time()
-    return "{:.2f}s".format(end - start)
+    return "{:.2f}".format(end - start)
 
 
 if __name__ == "__main__":

@@ -11,6 +11,16 @@ class Client:
         self.container = None
         self.container_port = None
 
+    def wait_for_container_to_setup(self):
+        response = None
+        while response == None:
+            try:
+                response = requests.get(
+                    f"http://{self.host}:{self.container_port}/greet"
+                )
+            except:
+                response = None
+
     def manual_run_container(self):
         self.container = self.client.containers.run(
             "server",
@@ -22,29 +32,18 @@ class Client:
         self.container_port = 5000
 
     def manual_load_model(self, model_name):
-        response = None
-        while response == None:
-            try:
-                response = requests.get(
-                    f"http://{self.host}:{self.container_port}/manual/load-model",
-                    params={"model-name": model_name},
-                )
-            except:
-                response = None
+        response = requests.get(
+            f"http://{self.host}:{self.container_port}/manual/load-model",
+            params={"model-name": model_name},
+        )
 
         return response.text
 
     def manual_switch_model(self, model_name):
-        response = None
-        while response == None:
-            try:
-                response = requests.get(
-                    f"http://{self.host}:{self.container_port}/manual/switch-model",
-                    params={"model-name": model_name},
-                )
-            except:
-                response = None
-
+        response = requests.get(
+            f"http://{self.host}:{self.container_port}/manual/switch-model",
+            params={"model-name": model_name},
+        )
         return response.text
 
     def inference(self, model_name):
