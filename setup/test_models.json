@@ -7,7 +7,7 @@
   "vgg19",
   "mobilenet_w1",
   "densenet121",
-  "densenet201",
+  "densenet169",
   "sparsenet121",
-  "sparsenet201"
+  "sparsenet169"
 ]
