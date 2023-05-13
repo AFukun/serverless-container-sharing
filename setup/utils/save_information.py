@@ -216,6 +216,11 @@ def build_childmodel_info(childmodel):
             layer_info["layer_type"] = "Dropout"
             layer_info["layer_name"] = layer.name
             layer_info["layer_rate"] = layer.rate
+        elif layer_type == tf.keras.layers.Permute:
+            layer_info["layer_type"] = "Permute"
+            layer_info["layer_name"] = layer.name
+            layer_info["layer_dims"] = layer.dims
+            # layer_info["layer_input_spec"] = layer.input_spec
         else:
             raise Exception("This type:{} has not been added".format(type(layer)))
 

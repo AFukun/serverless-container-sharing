@@ -18,6 +18,7 @@ from tensorflow.keras.layers import (
     ReLU,
     Reshape,
     Dropout,
+    Permute,
 )
 from tensorflow.python.keras import activations
 
@@ -256,6 +257,10 @@ def transform_by_layer_info(layer, layer_info):
     elif layer_type == tf.keras.layers.Dropout:
         layer.name = layer_info["layer_name"]
         layer.rate = layer_info["layer_rate"]
+    elif layer_type == tf.keras.layers.Permute:
+        layer.name = layer_info["layer_name"]
+        layer.dims = layer_info["layer_dims"]
+        # layer.input_spec = layer_info["layer_input_spec"]
 
 
 def swap_node_location(parentmodel_layers, node_to_node_mapping, model_info, model):
@@ -391,6 +396,10 @@ def slow_model_structure_transformation(parentModel, childmodel_info, node_to_no
                 layer = Dropout(
                     name=layer_info["layer_name"], rate=layer_info["layer_rate"]
                 )
+            elif layer_info["layer_type"] == "Permute":
+                layer = Permute(
+                    name=layer_info["layer_name"], dims=layer_info["layer_dims"]
+                )
             else:
                 raise Exception("This type has not been added")
             parentmodel_layers.append(layer)
@@ -516,6 +525,10 @@ def model_structure_transformation(parentModel, childmodel_info, node_to_node_ma
             elif layer_info["layer_type"] == "Dropout":
                 layer = Dropout(
                     name=layer_info["layer_name"], rate=layer_info["layer_rate"]
+                )
+            elif layer_info["layer_type"] == "Permute":
+                layer = Permute(
+                    name=layer_info["layer_name"], dims=layer_info["layer_dims"]
                 )
             else:
                 raise Exception("This type has not been added")

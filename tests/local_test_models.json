@@ -1,1 +1,1 @@
-["vgg16", "resnet18", "mobilenet_w1"]
+["resnet18","shufflenet_g1_w1"]
