@@ -32,7 +32,9 @@ tf_applications = {
 }
 
 
-def gen_model_data(data_dir, model_name_list, use_tf_native_app=False):
+def gen_model_data(
+    data_dir, model_name_list, use_tf_native_app=False, no_solution=False
+):
     models = []
     for model_name in model_name_list:
         if not exists(f"{data_dir}{model_name}.h5"):

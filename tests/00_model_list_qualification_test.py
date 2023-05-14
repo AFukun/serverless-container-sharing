@@ -20,6 +20,7 @@ from utils import *
 
 model_name_list = []
 with open("tests/local_test_models.json") as file:
+    # with open("tests/pt_models.json") as file:
     model_name_list = json.load(file)
 
 
