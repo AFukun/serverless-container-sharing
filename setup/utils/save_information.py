@@ -221,6 +221,10 @@ def build_childmodel_info(childmodel):
             layer_info["layer_name"] = layer.name
             layer_info["layer_dims"] = layer.dims
             # layer_info["layer_input_spec"] = layer.input_spec
+        elif layer_type == tf.keras.layers.LeakyReLU:
+            layer_info["layer_type"] = "LeakyReLU"
+            layer_info["layer_name"] = layer.name
+            layer_info["layer_alpha"] = layer.alpha
         else:
             raise Exception("This type:{} has not been added".format(type(layer)))
 

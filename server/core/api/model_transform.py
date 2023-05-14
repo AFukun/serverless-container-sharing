@@ -19,6 +19,7 @@ from tensorflow.keras.layers import (
     Reshape,
     Dropout,
     Permute,
+    LeakyReLU,
 )
 from tensorflow.python.keras import activations
 
@@ -261,6 +262,9 @@ def transform_by_layer_info(layer, layer_info):
         layer.name = layer_info["layer_name"]
         layer.dims = layer_info["layer_dims"]
         # layer.input_spec = layer_info["layer_input_spec"]
+    elif layer_type == tf.keras.layers.LeakyReLU:
+        layer.name = layer_info["layer_name"]
+        layer.alpha = layer_info["layer_alpha"]
 
 
 def swap_node_location(parentmodel_layers, node_to_node_mapping, model_info, model):
@@ -400,6 +404,10 @@ def slow_model_structure_transformation(parentModel, childmodel_info, node_to_no
                 layer = Permute(
                     name=layer_info["layer_name"], dims=layer_info["layer_dims"]
                 )
+            elif layer_info["layer_type"] == "LeakyReLU":
+                layer = LeakyReLU(
+                    name=layer_info["layer_name"], alpha=layer_info["layer_alpha"]
+                )
             else:
                 raise Exception("This type has not been added")
             parentmodel_layers.append(layer)
@@ -529,6 +537,10 @@ def model_structure_transformation(parentModel, childmodel_info, node_to_node_ma
             elif layer_info["layer_type"] == "Permute":
                 layer = Permute(
                     name=layer_info["layer_name"], dims=layer_info["layer_dims"]
+                )
+            elif layer_info["layer_type"] == "LeakyReLU":
+                layer = LeakyReLU(
+                    name=layer_info["layer_name"], alpha=layer_info["layer_alpha"]
                 )
             else:
                 raise Exception("This type has not been added")
