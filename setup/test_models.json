@@ -8,6 +8,6 @@
   "mobilenet_w1",
   "densenet121",
   "densenet169",
-  "sparsenet121",
-  "sparsenet169"
+  "xception",
+  "inceptionv3"
 ]

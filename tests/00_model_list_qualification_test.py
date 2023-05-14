@@ -24,22 +24,23 @@ with open("tests/local_test_models.json") as file:
     model_name_list = json.load(file)
 
 
+def get_model_and_convert(model_name):
+    pt_model = get_model(model_name)
+    input_var = Variable(torch.FloatTensor(np.random.uniform(0, 1, (1, 3, 64, 64))))
+    # summary(pt_model, (3, 224, 224))
+    return pytorch_to_keras(
+        pt_model,
+        input_var,
+        # verbose=True,
+        change_ordering=True,
+        name_policy="renumerate",
+    )
+
+
 for model_name in model_name_list:
     print(f"[{model_name}]")
     try:
-        pt_model = get_model(model_name)
-        input_var = Variable(
-            torch.FloatTensor(np.random.uniform(0, 1, (1, 3, 224, 224)))
-        )
-        # summary(pt_model, (3, 224, 224))
-        model = pytorch_to_keras(
-            pt_model,
-            input_var,
-            # verbose=True,
-            change_ordering=True,
-            name_policy="renumerate",
-        )
-        # model(tf.random.uniform((1, 224, 224, 3)))
+        model = get_model_and_convert(model_name)
         build_childmodel_info(model)
         print("----------------Pass----------------")
     except Exception:
