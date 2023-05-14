@@ -1,4 +1,1 @@
-[
-  "resnet18",
-  "menet108_8x1_g3"
-]
+["mobilenet_w1", "xception"]

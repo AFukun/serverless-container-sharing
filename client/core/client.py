@@ -46,6 +46,12 @@ class Client:
         )
         return response.text
 
+    def manual_inference(self):
+        response = requests.get(
+            f"http://{self.host}:{self.container_port}/manual/inference",
+        )
+        return response.text
+
     def inference(self, model_name):
         status = "reuse container"
         if self.container == None:

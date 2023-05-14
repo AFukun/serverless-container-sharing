@@ -48,5 +48,18 @@ def manual_switch_model():
     return "{:.2f}".format(end - start)
 
 
+@app.route("/manual/inference")
+def manual_inference():
+    start = time.time()
+    try:
+        server.manual_inference()
+    except:
+        server.manual_get_model()
+        start = time.time()
+        server.manual_inference()
+    end = time.time()
+    return "{:.2f}".format(end - start)
+
+
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)

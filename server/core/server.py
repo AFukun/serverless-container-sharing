@@ -15,12 +15,20 @@ class Server:
     def manual_load_model(self, model_name):
         self.model = None
         self.model = api.load_model(self.data_dir, model_name)
+        self._set_input()
 
     def manual_switch_model(self, model_name):
         if self.model._name == model_name:
             api.load_weights(self.data_dir, self.model)
         else:
             api.switch_model(self.data_dir, self.model, model_name)
+
+    def manual_inference(self):
+        return self.model(self.input)
+
+    def manual_get_model(self):
+        self.model = api.get_model(self.model._name)
+        self.model(self.input)
 
     def _setup_model(self, model_name):
         # temp logic
