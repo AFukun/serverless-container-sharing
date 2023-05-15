@@ -14,7 +14,6 @@ for model_a_name in test_model_list:
     row = [model_a_name]
     for model_b_name in test_model_list:
         model_a = load_model(data_dir, model_a_name)
-        input = api.generate_random_input(model_a)
         start = time.time()
         if model_a_name == model_b_name:
             load_weights(data_dir, model_a)
@@ -22,5 +21,3 @@ for model_a_name in test_model_list:
             model_b = switch_model(data_dir, model_a, model_b_name)
         end = time.time()
         print(f"{model_a_name} to {model_b_name} in {end -start}s")
-        # model_a = api.get_model(model_a_name)
-        # print(model_a(input))

@@ -1,1 +1,1 @@
-["mobilenet_w1", "xception"]
+["resnet20_cifar10", "resnet20_cifar100", "resnet20_svhn"]

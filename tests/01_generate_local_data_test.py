@@ -13,4 +13,4 @@ data_dir = "tmp/"
 
 with open("tests/local_test_models.json") as file:
     test_model_list = json.load(file)
-utils.gen_model_data(data_dir, test_model_list, no_solution=True)
+utils.gen_model_data(data_dir, test_model_list)

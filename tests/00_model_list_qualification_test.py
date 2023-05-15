@@ -7,7 +7,7 @@ import torch
 import tensorflow as tf
 from torch.autograd import Variable
 from torchsummary import summary
-from pytorchcv.model_provider import get_model
+from pytorchcv.model_provider import get_model as get_pt_model
 from pytorch2keras import pytorch_to_keras
 
 
@@ -25,8 +25,8 @@ with open("tests/local_test_models.json") as file:
 
 
 def get_model_and_convert(model_name):
-    pt_model = get_model(model_name)
-    input_var = Variable(torch.FloatTensor(np.random.uniform(0, 1, (1, 3, 64, 64))))
+    pt_model = get_pt_model(model_name)
+    input_var = get_pt_model_input(model_name)
     # summary(pt_model, (3, 224, 224))
     return pytorch_to_keras(
         pt_model,

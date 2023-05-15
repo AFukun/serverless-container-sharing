@@ -36,7 +36,7 @@ tf.compat.v1.logging.set_verbosity(tf.compat.v1.logging.ERROR)
 
 
 def get_pt_model_input(model_name):
-    if "_cifar10" in model_name:
+    if "cifar" in model_name or "svhn" in model_name:
         return Variable(torch.FloatTensor(np.random.uniform(0, 1, (1, 3, 32, 32))))
     elif "ception" in model_name:
         return Variable(torch.FloatTensor(np.random.uniform(0, 1, (1, 3, 299, 299))))
@@ -45,10 +45,15 @@ def get_pt_model_input(model_name):
 
 
 def gen_model_data(
-    data_dir, model_name_list, use_tf_native_app=False, no_solution=False
+    data_dir,
+    model_name_list,
+    use_tf_native_app=False,
 ):
     models = []
+    generated_model_count = 0
+    total_model_count = len(model_name_list)
     for model_name in model_name_list:
+        generated_model_count += 1
         if not exists(f"{data_dir}{model_name}.h5"):
             if use_tf_native_app:
                 model = tf_applications[model_name]()
@@ -68,8 +73,11 @@ def gen_model_data(
                 info = build_childmodel_info(model)
                 json.dump(info, outfile, cls=NumpyEncoder)
             models.append(model)
+            print(f"generate {model_name}({generated_model_count}/{total_model_count})")
+
         else:
             models.append(load_model(f"{data_dir}{model_name}.h5"))
+            print(f"load {model_name}({generated_model_count}/{total_model_count})")
 
     generated_solution_count = 0
     total_solution_count = len(models) * (len(models) - 1)
