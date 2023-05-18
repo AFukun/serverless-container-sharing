@@ -1,8 +1,8 @@
 import time
-from argparse import ArgumentParser
-from flask import Flask, request
 
-from core import Server
+
+from argparse import ArgumentParser
+
 
 parser = ArgumentParser(
     prog="Tensorflow Server",
@@ -11,13 +11,19 @@ parser = ArgumentParser(
 parser.add_argument("-D", "--data-dir")
 args = parser.parse_args()
 
+from core import Server
+
+server = Server(args.data_dir)
+
+
+from flask import Flask, request
 
 app = Flask(__name__)
-server = Server(args.data_dir)
 
 
 @app.route("/greet")
 def greet():
+    print(time.time())
     return "ready to go"
 
 
@@ -62,4 +68,5 @@ def manual_inference():
 
 
 if __name__ == "__main__":
+    print(time.time())
     app.run(host="0.0.0.0", port=5000)

@@ -13,7 +13,7 @@ REPEATS = 10
 
 client = Client("ssh://luosf@blockchain2")
 
-with open("setup/test_models.json") as file:
+with open("experiments/test_models.json") as file:
     test_model_list = json.load(file)
 
 patch_models = ["xception", "inceptionv3"]

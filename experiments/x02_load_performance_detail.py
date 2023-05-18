@@ -8,11 +8,11 @@ from prettytable import PrettyTable
 sys.path.insert(1, "client")
 from core import Client
 
-REPEATS = 10
+REPEATS = 1
 
 client = Client("ssh://luosf@blockchain2")
 
-with open("setup/test_models.json") as file:
+with open("experiments/test_models.json") as file:
     test_model_list = json.load(file)
 
 table = PrettyTable(["", "setup time", "load time", "inference time"])

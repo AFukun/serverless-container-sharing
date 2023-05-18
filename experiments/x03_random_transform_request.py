@@ -13,7 +13,7 @@ REPEATS = 1000
 
 client = Client("ssh://luosf@blockchain2")
 
-with open("setup/test_models.json") as file:
+with open("setup/pt_models.json") as file:
     available_model_list = json.load(file)
 
 model_list_size = len(available_model_list)

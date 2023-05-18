@@ -1,1 +1,1 @@
-["resnet20_cifar10", "resnet20_cifar100", "resnet20_svhn"]
+["vgg11", "resnet18"]
