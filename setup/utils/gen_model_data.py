@@ -6,6 +6,7 @@ import torch
 from torch.autograd import Variable
 from pytorchcv.model_provider import get_model as get_pt_model
 from pytorch2keras import pytorch_to_keras
+from nasbench_keras import ModelSpec, build_keras_model, build_module
 
 
 from .json_encoder import NumpyEncoder
@@ -100,3 +101,39 @@ def gen_model_data(
                 print(
                     f"{model_a._name} to {model_b.name}({generated_solution_count}/{total_solution_count})"
                 )
+
+
+def gen_nasbench_model_data(data_dir, model_graphs, sample_set_size=10):
+    config = {
+        "available_ops": ["conv3x3-bn-relu", "conv1x1-bn-relu", "maxpool3x3"],
+        "stem_filter_size": 128,
+        "data_format": "channels_last",
+        "num_stacks": 3,
+        "num_modules_per_stack": 2,
+        "num_labels": 1000,
+    }
+    index = 1
+
+    for _, graph_info in model_graphs.items():
+        outfile_name = f"nasbench_{index:06d}"
+        if not exists(f"{data_dir}{outfile_name}.h5"):
+            matrix, labels_list = graph_info
+            labels = (
+                ["input"]
+                + [config["available_ops"][l] for l in labels_list[1:-1]]
+                + ["output"]
+            )
+            spec = ModelSpec(matrix, labels, data_format="channels_last")
+            inputs = tf.keras.layers.Input((224, 224, 3), 1)
+            outputs = build_module(
+                spec=spec, inputs=inputs, channels=128, is_training=True
+            )
+            model = tf.keras.Model(inputs=inputs, outputs=outputs)
+            model.save(f"{data_dir}{outfile_name}.h5")
+            model.save_weights(f"{data_dir}{outfile_name}_weights.h5")
+            with open(f"{data_dir}{outfile_name}_info.json", "w") as f:
+                info = build_childmodel_info(model)
+                json.dump(info, f)
+        index += 1
+        if index > sample_set_size:
+            break

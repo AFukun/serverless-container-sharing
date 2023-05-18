@@ -1,2 +1,2 @@
-from .gen_model_data import gen_model_data
+from .gen_model_data import gen_model_data, gen_nasbench_model_data
 from .save_information import build_childmodel_info, compute_node_to_node_mapping

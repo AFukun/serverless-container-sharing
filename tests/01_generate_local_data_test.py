@@ -14,3 +14,7 @@ data_dir = "tmp/"
 with open("tests/local_test_models.json") as file:
     test_model_list = json.load(file)
 utils.gen_model_data(data_dir, test_model_list)
+
+with open("setup/nasbench_models.json", "rb") as f:
+    nasbench_model_graphs = json.load(f)
+utils.gen_nasbench_model_data(data_dir, nasbench_model_graphs)
