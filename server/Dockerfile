@@ -6,7 +6,6 @@ RUN pip install tf2cv -i ${PIPSRC}
 
 COPY core/           core/
 COPY patch/          patch/
-COPY ../setup/utils/ utils/
 COPY app.py .
 
 RUN cp "patch/base_layer.py"    "/usr/local/lib/python3.6/dist-packages/tensorflow_core/python/keras/engine"

@@ -10,7 +10,7 @@ parser = ArgumentParser(
 parser.add_argument("-D", "--data-dir")
 args = parser.parse_args()
 
-with open("pt_models.json") as file:
+with open("imgclsmob_models.json") as file:
     test_model_list = json.load(file)
 
 if __name__ == "__main__":

@@ -1,6 +1,8 @@
 import time
+
+start_time = time.time()
+
 from argparse import ArgumentParser
-from utils import *
 
 parser = ArgumentParser(
     prog="pre-tester",
@@ -10,18 +12,34 @@ parser.add_argument("-D", "--data-dir")
 parser.add_argument("-M", "--model-name")
 args = parser.parse_args()
 
-logs = []
+import importlib.util
+import sys
+
+
+def lazy_import(name):
+    spec = importlib.util.find_spec(name)
+    loader = importlib.util.LazyLoader(spec.loader)
+    spec.loader = loader
+    module = importlib.util.module_from_spec(spec)
+    sys.modules[name] = module
+    loader.exec_module(module)
+    return module
+
+
+utils = lazy_import("utils")
+
 
 start = time.time()
-model = load_model(args.data_dir, args.model_name)
+model = utils.load_model(args.data_dir, args.model_name)
 end = time.time()
-logs.append(f"model load time: {end - start}")
+load_time = end - start
 
+input = utils.generate_random_input(model)
 start = time.time()
-input = generate_random_input(model)
-output = inference(model, input)
+output = utils.inference(model, input)
 end = time.time()
-logs.append(f"inference time: {end - start}")
-logs.append(f"result: {output}")
+inference_time = end - start
 
-print(logs)
+print(inference_time)
+print(load_time)
+print(start_time)
