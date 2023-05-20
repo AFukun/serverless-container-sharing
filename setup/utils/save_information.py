@@ -98,7 +98,7 @@ def slow_compute_node_to_node_mapping(parentmodel, childmodel):
                     break
     return node_to_node_mapping
 
-
+from tensorflow.python.keras.engine.base_layer import TensorFlowOpLayer
 def build_childmodel_info(childmodel):
     childmodel_info = []
     for layer in childmodel.layers:
@@ -131,7 +131,11 @@ def build_childmodel_info(childmodel):
         layer_info["node_output_tensors_shape"] = tuple(
             layer.inbound_nodes[0].output_tensors[0].shape
         )
-        layer_info["node_input_shapes"] = layer.inbound_nodes[0].input_shapes
+        # layer_info["node_input_shapes"] = layer.inbound_nodes[0].input_shapes
+        if type(layer.inbound_nodes[0].input_tensors) == list:
+            layer_info['node_input_shapes'] = [tuple(input_tensor[0].shape) for _, input_tensor in enumerate(layer.inbound_nodes[0].input_tensors)]
+        else:
+            layer_info['node_input_shapes'] = tuple(layer.inbound_nodes[0].input_tensors[0].shape)
         layer_info["node_output_shapes"] = layer.inbound_nodes[0].output_shapes
         #######################
         if layer_type == tf.keras.layers.Conv2D:
@@ -225,6 +229,8 @@ def build_childmodel_info(childmodel):
             layer_info["layer_type"] = "LeakyReLU"
             layer_info["layer_name"] = layer.name
             layer_info["layer_alpha"] = layer.alpha
+        elif layer_type == TensorFlowOpLayer:
+            continue
         else:
             raise Exception("This type:{} has not been added".format(type(layer)))
 
@@ -260,16 +266,30 @@ def find_solution(parent_node_group, child_node_group, parent_model_layer_size, 
             solution.append((value, child_model_layer_size + value))
     return solution
 
+
+from tensorflow.python.keras.engine.base_layer import TensorFlowOpLayer
+def ignore_TFop(model):
+    layers = []
+    for layer in model.layers:
+        if type(layer) != TensorFlowOpLayer:
+            layers.append(layer)
+    return layers
 def compute_node_to_node_mapping(parentmodel, childmodel):
     '''
         design strategy:
         step 1: group
         Step 2: match
     '''
-    parent_node_group = node_group(parentmodel)
-    child_node_group = node_group(childmodel)
-    parent_model_layer_size = len(parentmodel.layers)
-    child_model_layer_size = len(childmodel.layers)
+    # parent_node_group = node_group(parentmodel)
+    # child_node_group = node_group(childmodel)
+    # parent_model_layer_size = len(parentmodel.layers)
+    # child_model_layer_size = len(childmodel.layers)
+    parentmodel_layers = ignore_TFop(parentmodel)
+    childmodel_layers = ignore_TFop(childmodel)
+    parent_node_group = node_group(parentmodel_layers)
+    child_node_group = node_group(childmodel_layers)
+    parent_model_layer_size = len(parentmodel_layers)
+    child_model_layer_size = len(childmodel_layers)
 
     node_to_node_mapping = find_solution(parent_node_group, child_node_group, parent_model_layer_size, child_model_layer_size)
     return node_to_node_mapping
