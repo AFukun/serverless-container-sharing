@@ -238,9 +238,9 @@ def build_childmodel_info(childmodel):
 
     return childmodel_info
 
-def node_group(model):
+def node_group(layers):
     group_type_index = {}
-    for _, layer in enumerate(model.layers):
+    for _, layer in enumerate(layers):
         layer_type = type(layer)
         layer_name = str(layer_type)
         if layer_name in group_type_index:
