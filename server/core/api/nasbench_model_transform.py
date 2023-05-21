@@ -457,14 +457,15 @@ def ignore_TFop(model):
     return layers
 def model_structure_transformation(parentModel, childmodel_info, node_to_node_mapping):
     # step 1: transform by node
+    parentmodel_layers_length = len(ignore_TFop(parentModel))
     childmodel_layers_length = len(childmodel_info)
     model = parentModel
+
     parentmodel_layers = ignore_TFop(model)
-    parentmodel_layers_length = len(parentmodel_layers)
 
     for _, mapping in enumerate(node_to_node_mapping):
         if mapping[0] < parentmodel_layers_length and mapping[1] < childmodel_layers_length:
-            transform_by_layer_info(model.layers[mapping[0]], childmodel_info[mapping[1]])
+            transform_by_layer_info(parentmodel_layers[mapping[0]], childmodel_info[mapping[1]])
         elif mapping[0] > parentmodel_layers_length:
             layer_info = childmodel_info[node_to_node_mapping[_][1]]
             if layer_info["layer_type"] == "InputLayer":

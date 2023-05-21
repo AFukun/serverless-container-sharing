@@ -247,16 +247,7 @@ def build_childmodel_info(childmodel):
     return childmodel_info
 
 
-def node_group(layers):
-    group_type_index = {}
-    for _, layer in enumerate(layers):
-        layer_type = type(layer)
-        layer_name = str(layer_type)
-        if layer_name in group_type_index:
-            group_type_index[layer_name].append(_)
-        else:
-            group_type_index[layer_name] = [_]
-    return group_type_index
+
 
 
 def find_solution(
@@ -289,7 +280,16 @@ def ignore_TFop(model):
         if type(layer) != TensorFlowOpLayer:
             layers.append(layer)
     return layers
-
+def node_group(layers):
+    group_type_index = {}
+    for _, layer in enumerate(layers):
+        layer_type = type(layer)
+        layer_name = str(layer_type)
+        if layer_name in group_type_index:
+            group_type_index[layer_name].append(_)
+        else:
+            group_type_index[layer_name] = [_]
+    return group_type_index
 
 def compute_node_to_node_mapping(parentmodel, childmodel):
     """
@@ -307,11 +307,11 @@ def compute_node_to_node_mapping(parentmodel, childmodel):
     child_node_group = node_group(childmodel_layers)
     parent_model_layer_size = len(parentmodel_layers)
     child_model_layer_size = len(childmodel_layers)
-
     node_to_node_mapping = find_solution(
         parent_node_group,
         child_node_group,
         parent_model_layer_size,
         child_model_layer_size,
     )
+
     return node_to_node_mapping
