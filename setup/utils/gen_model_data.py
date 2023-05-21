@@ -116,6 +116,7 @@ def gen_nasbench_model_data(data_dir, model_graphs, sample_set_size=423624):
 
     for _, graph_info in model_graphs.items():
         outfile_name = f"nasbench_{index:06d}"
+        print(f"{outfile_name}({index}/{sample_set_size})")
         if not exists(f"{data_dir}{outfile_name}.h5"):
             matrix, labels_list = graph_info
             labels = (
@@ -129,10 +130,11 @@ def gen_nasbench_model_data(data_dir, model_graphs, sample_set_size=423624):
                 spec=spec, inputs=inputs, channels=128, is_training=True
             )
             model = tf.keras.Model(inputs=inputs, outputs=outputs)
-            model.summary()
-            info = build_childmodel_info(model)
             model.save(f"{data_dir}{outfile_name}.h5")
             model.save_weights(f"{data_dir}{outfile_name}_weights.h5")
+            # model.summary()
+            model = load_model(f"{data_dir}{outfile_name}.h5")
+            info = build_childmodel_info(model)
             with open(f"{data_dir}{outfile_name}_info.json", "w") as f:
                 json.dump(info, f)
         index += 1
