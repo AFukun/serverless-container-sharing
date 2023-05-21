@@ -584,7 +584,6 @@ record_data("add.csv", "add", record)
 
 # replace
 model = tf.keras.models.load_model("/data/resnet50.h5")
-
 record = test_resnet50_replace(model)
 record_data("replace.csv", "load_weights", record)
 
