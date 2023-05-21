@@ -9,7 +9,10 @@ from .save_information import compute_node_to_node_mapping
 
 
 def load_model(data_dir, model_name):
-    return tensorflow_load_model(f"{data_dir}{model_name}.h5")
+    model = tensorflow_load_model(f"{data_dir}{model_name}.h5")
+    model._name = model_name
+
+    return model
 
 
 def load_weights(data_dir, model):

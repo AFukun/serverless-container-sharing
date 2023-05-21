@@ -21,7 +21,7 @@ for _ in range(0, TOTAL_TEST_CASE):
     print(model_b_name, model_a_name)
 
     generate_solution(data_dir, model_a_name, model_b_name)
-    # model_a = load_model(data_dir, model_a_name)
-    # model_a.summary()
-    # model_b = switch_model(data_dir, model_a, model_b_name, use_nasbench_transform=True)
-    # model_b.summary()
+    model_a = load_model(data_dir, model_a_name)
+    model_a.summary()
+    model_b = switch_model(data_dir, model_a, model_b_name, use_nasbench_transform=True)
+    model_b.summary()
