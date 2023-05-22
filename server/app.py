@@ -54,6 +54,23 @@ def manual_switch_model():
     return "{:.2f}".format(end - start)
 
 
+@app.route("/manual/switch-nasbench-model")
+def manual_switch_nasbench_model():
+    args = request.args
+    model_name = args.get("model-name")
+    server.manual_generate_solution(model_name)
+    start = time.time()
+    server.manual_switch_nasbench_model(model_name)
+    end = time.time()
+    switch_structure_time = end - start
+    server.manual_load_model(model_name)
+    start = time.time()
+    server.manual_load_weights()
+    end = time.time()
+    load_weights_time = end - start
+    return "{:.6f}".format(switch_structure_time + load_weights_time)
+
+
 @app.route("/manual/inference")
 def manual_inference():
     start = time.time()

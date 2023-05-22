@@ -10,10 +10,12 @@ RUN pip install pytorch2keras
 RUN pip install pytorchcv
 RUN pip install --upgrade h5py==2.10.0
 
-COPY utils/ utils/
-COPY patch/ patch/
-COPY setup.py .
+COPY utils/                utils/
+COPY patch/                patch/
+COPY nasbench/             nasbench/
+COPY setup.py              .
 COPY imgclsmob_models.json .
+COPY nasbench_models.json  .
 
 RUN cp "patch/reshape_layers.py"      "/usr/local/lib/python3.7/site-packages/onnx2keras"
 RUN cp "patch/converter.py"           "/usr/local/lib/python3.7/site-packages/onnx2keras"

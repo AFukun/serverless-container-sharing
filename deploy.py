@@ -28,21 +28,21 @@ def deploy_models():
     _, logs = client.images.build(rm=True, path="setup", tag="setup")
     _print_logs(logs)
 
-    # if REFRESH_VOLUME:
-    #     client.volumes.get("data").remove()
-    #     client.volumes.create("data")
+    if REFRESH_VOLUME:
+        client.volumes.get("data").remove()
+        client.volumes.create("data")
 
-    # container = client.containers.create(
-    #     "setup",
-    #     command="python setup.py -D /data/",
-    #     volumes=["data:/data"],
-    # )
-    # try:
-    #     container.start()
-    #     container.wait()
-    # finally:
-    #     print(container.logs().decode())
-    #     container.remove()
+    container = client.containers.create(
+        "setup",
+        command="python setup.py -D /data/",
+        volumes=["data:/data"],
+    )
+    try:
+        container.start()
+        container.wait()
+    finally:
+        print(container.logs().decode())
+        container.remove()
 
 
 if __name__ == "__main__":

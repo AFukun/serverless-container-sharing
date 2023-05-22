@@ -1,11 +1,14 @@
 import json
 import numpy as np
+import tensorflow as tf
 from tensorflow.keras.models import load_model as tensorflow_load_model
 from .model_transform import model_structure_transformation as transform
 from .nasbench_model_transform import (
     model_structure_transformation as nasbench_transform,
 )
 from .save_information import compute_node_to_node_mapping
+
+tf.compat.v1.logging.set_verbosity(tf.compat.v1.logging.ERROR)
 
 
 def load_model(data_dir, model_name):
@@ -30,9 +33,7 @@ def generate_solution(data_dir, parent_model_name, child_model_name):
         json.dump(node_to_node_mapping, outfile)
 
 
-def switch_model(
-    data_dir, parent_model, child_model_name, use_nasbench_transform=False
-):
+def switch_model(data_dir, parent_model, child_model_name):
     parent_model_name = parent_model._name
     with open(f"{data_dir}{child_model_name}_info.json") as input_file:
         child_model_info = json.load(input_file)
@@ -41,13 +42,24 @@ def switch_model(
     ) as input_file:
         solution = json.load(input_file)
 
-    if use_nasbench_transform:
-        child_model = nasbench_transform(parent_model, child_model_info, solution)
-    else:
-        child_model = transform(parent_model, child_model_info, solution)
+    child_model = transform(parent_model, child_model_info, solution)
 
     child_model._name = child_model_name
     load_weights(data_dir, child_model)
+
+    return child_model
+
+
+def switch_nasbench_model(data_dir, parent_model, child_model_name):
+    parent_model_name = parent_model._name
+    with open(f"{data_dir}{child_model_name}_info.json") as input_file:
+        child_model_info = json.load(input_file)
+    with open(
+        f"{data_dir}{parent_model_name}_to_{child_model_name}_solution.json"
+    ) as input_file:
+        solution = json.load(input_file)
+
+    child_model = nasbench_transform(parent_model, child_model_info, solution)
 
     return child_model
 

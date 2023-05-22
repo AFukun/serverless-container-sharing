@@ -8,7 +8,7 @@ import sys
 
 sys.path.insert(1, "client")
 
-REPEATS = 1000
+REPEATS = 500
 
 from core import Client
 

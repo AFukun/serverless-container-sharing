@@ -29,11 +29,20 @@ class Server:
         self.model = None
         self.model = api.load_model(self.data_dir, model_name)
 
+    def manual_load_weights(self):
+        api.load_weights(self.data_dir, self.model)
+
+    def manual_generate_solution(self, child_model_name):
+        api.generate_solution(self.data_dir, self.model._name, child_model_name)
+
     def manual_switch_model(self, model_name):
         if self.model._name == model_name:
-            load_weights(self.data_dir, self.model)
+            api.load_weights(self.data_dir, self.model)
         else:
-            switch_model(self.data_dir, self.model, model_name)
+            api.switch_model(self.data_dir, self.model, model_name)
+
+    def manual_switch_nasbench_model(self, model_name):
+        api.switch_nasbench_model(self.data_dir, self.model, model_name)
 
     def manual_inference(self):
         if self.input is None:

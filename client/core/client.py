@@ -46,6 +46,13 @@ class Client:
         )
         return response.text
 
+    def manual_switch_nasbench_model(self, model_name):
+        response = requests.get(
+            f"http://{self.host}:{self.container_port}/manual/switch-nasbench-model",
+            params={"model-name": model_name},
+        )
+        return response.text
+
     def manual_inference(self):
         response = requests.get(
             f"http://{self.host}:{self.container_port}/manual/inference",
