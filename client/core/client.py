@@ -31,6 +31,19 @@ class Client:
         )
         self.container_port = 5000
 
+    def manual_run_gpu_container(self):
+        self.container = self.client.containers.run(
+            "server",
+            volumes=["data:/data"],
+            command="python app.py -D /data/",
+            ports={"5000/tcp": 5000},
+            device_requests=[
+                docker.types.DeviceRequest(device_ids=["0"], capabilities=[["gpu"]])
+            ],
+            detach=True,
+        )
+        self.container_port = 5000
+
     def manual_load_model(self, model_name):
         response = requests.get(
             f"http://{self.host}:{self.container_port}/manual/load-model",

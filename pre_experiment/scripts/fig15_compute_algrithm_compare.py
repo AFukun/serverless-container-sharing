@@ -443,8 +443,12 @@ def slow_model_structure_transformation(
             parentmodel_layers.append(layer)
 
     # step 2: transformation by edge
-    childModel = swap_node_location(
-        parentmodel_layers, node_to_node_mapping, childmodel_info, model
+    childModel = fast_swap_node_location(
+        parentmodel_layers,
+        node_to_node_mapping,
+        childmodel_info,
+        model,
+        len(parentmodel_layers),
     )
 
     # step3: load childModel weights
@@ -1117,10 +1121,13 @@ def munkres(costs):
     return result
 
 
-def test_resnet50_add(model, model_info):
-    record = []
+def test_childmodel_add(model, model_info):
+    record = {}
     for _, layer_info in enumerate(model_info):
-        if _ == 0 or _ == 1:
+        # if _ == 0 or _ == 1:
+        #     continue
+        if _ == 0:
+            record[0] = 0
             continue
         start = time.time()
         if layer_info["layer_type"] == "InputLayer":
@@ -1222,19 +1229,38 @@ def test_resnet50_add(model, model_info):
         layer(model.layers[_].inbound_nodes[0].input_tensors)
         end = time.time()
         during = end - start
-        if len(layer.weights) > 0:
-            record.append([str(type(layer)), during, layer.weights[0].shape])
-        else:
-            record.append([str(type(layer)), during])
+        # if len(layer.weights) > 0:
+        #     record.append([str(type(layer)), during, layer.weights[0].shape])
+        # else:
+        #    record.append([str(type(layer)), during])
+        record[_] = during
+
     return record
 
 
-def record_operation_time(resnet50_model, model_info):
-    add_operations_time = {}
-    records = test_resnet50_add(resnet50_model, model_info)
-    for i, record in enumerate(records):
-        add_operations_time[record[0]] = float(record[1])
-    return add_operations_time
+def test_model_reshape(parentmodel, childmodel, parentmodel_info, childmodel_info):
+    weights_set = {Dense, Conv2D, tf.compat.v1.keras.layers.BatchNormalization}
+    record = {}
+    for i, parentlayer in enumerate(parentmodel.layers):
+        for j, childlayer in enumerate(childmodel.layers):
+            if type(parentlayer) in weights_set and type(parentlayer) == type(
+                childlayer
+            ):
+                start = time.time()
+                transform_by_layer_info(parentlayer, childmodel_info[j])
+                end = time.time()
+                during = end - start
+                record[(i, j)] = during
+                transform_by_layer_info(parentlayer, parentmodel_info[i])
+    return record
+
+
+def record_operation_time(parentmodel, childmodel, parentmodel_info, childmodel_info):
+    add_operations_time = test_childmodel_add(childmodel, childmodel_info)
+    reshape_operations_time = test_model_reshape(
+        parentmodel, childmodel, parentmodel_info, childmodel_info
+    )
+    return add_operations_time, reshape_operations_time
 
 
 # with open('add.csv', newline='') as csvfile:
@@ -1247,7 +1273,7 @@ def record_operation_time(resnet50_model, model_info):
 #         add_operations_time[record[0]] = float(record[1])
 
 meta_operation_execute_time = {
-    "reshape": 0.0025,
+    "reshape": 0.000,
     "add": 0,
     "fail": 0,
     "connect": 0.0008,
@@ -1264,7 +1290,9 @@ def group_tensor_type():
     return inMatrixSet
 
 
-def build_cost_matrix(parentModel, childModel, add_operations_time):
+def build_cost_matrix(
+    parentModel, childModel, add_operations_time, reshape_operations_time
+):
     inMatrixSet = group_tensor_type()
     costMatrix = []
     n = len(parentModel.layers)
@@ -1278,7 +1306,7 @@ def build_cost_matrix(parentModel, childModel, add_operations_time):
                 tensorTypeOfParent == tensorTypeOfChild
                 and tensorTypeOfParent in inMatrixSet
             ):
-                cost = (i, j, meta_operation_execute_time["reshape"])
+                cost = (i, j, reshape_operations_time[(i, j)])
             elif (
                 tensorTypeOfParent == tensorTypeOfChild
                 and tensorTypeOfParent not in inMatrixSet
@@ -1300,11 +1328,7 @@ def build_cost_matrix(parentModel, childModel, add_operations_time):
         for j in range(m):
             if i == j:
                 if i > 0 and type(childModel.layers[i]) != Flatten:
-                    cost = (
-                        i + n,
-                        j,
-                        add_operations_time[str(type(childModel.layers[i]))],
-                    )
+                    cost = (i + n, j, add_operations_time[j])
                     # cost = (i + n, j, 0.5)
                 else:
                     cost = (i + n, j, 0.0)
@@ -1319,106 +1343,103 @@ def build_cost_matrix(parentModel, childModel, add_operations_time):
     return costMatrix
 
 
-resnet50_model = tf.keras.models.load_model("/data/resnet50.h5")
-model_info = build_childmodel_info(resnet50_model)
-add_operations_time = record_operation_time(resnet50_model, model_info)
+import pickle
 
 
-parentModel = tf.keras.models.load_model("/data/vgg16.h5")
-childModel = tf.keras.models.load_model("/data/vgg19.h5")
-childModel.save_weights(r"save_weights.h5")
-childmodel_info = build_childmodel_info(childModel)
+def test_slow():
+    slow_test_list = [
+        [
+            # tf.keras.applications.VGG16(weights="imagenet"),
+            # tf.keras.applications.VGG19(weights="imagenet"),
+            tf.keras.models.load_model("/data/vgg16.h5"),
+            tf.keras.models.load_model("/data/vgg19.h5"),
+        ],
+        [
+            # tf.keras.applications.VGG16(weights="imagenet"),
+            # tf.keras.applications.ResNet50(weights="imagenet"),
+            tf.keras.models.load_model("/data/vgg16.h5"),
+            tf.keras.models.load_model("/data/resnet50.h5"),
+        ],
+        [
+            # tf.keras.applications.ResNet50(weights="imagenet"),
+            # tf.keras.applications.VGG19(weights="imagenet"),
+            tf.keras.models.load_model("/data/resnet50.h5"),
+            tf.keras.models.load_model("/data/vgg19.h5"),
+        ],
+    ]
+    # slow_test_list = [
+    #     [tf.keras.applications.VGG16(weights='imagenet'), tf.keras.applications.VGG19(weights='imagenet')],
+    #     ]
+    for model_pair in slow_test_list:
+        parentmodel = model_pair[0]
+        childmodel = model_pair[1]
+        parentmodel_info = build_childmodel_info(model_pair[0])
+        childmodel_info = build_childmodel_info(model_pair[1])
+        childmodel.save_weights("save_weights.h5")
+        add_operations_time, reshape_operations_time = record_operation_time(
+            parentmodel, childmodel, parentmodel_info, childmodel_info
+        )
+        start = time.time()
+        cost_matrix = build_cost_matrix(
+            parentmodel, childmodel, add_operations_time, reshape_operations_time
+        )
+        node_to_node_mapping = munkres(cost_matrix)
+        end = time.time()
+        print("Time for slow computing algorithms (Munkres): ", end - start)
 
-start = time.time()
-cost_matrix = build_cost_matrix(parentModel, childModel, add_operations_time)
-node_to_node_mapping = munkres(cost_matrix)
-end = time.time()
-print("Time for slow computing algorithms (Munkres): ", end - start)
-start = time.time()
-childModel = slow_model_structure_transformation(
-    parentModel, childmodel_info, node_to_node_mapping
-)
-childModel.load_weights(r"save_weights.h5")
-end = time.time()
-print("Transformation time in slow computing algorithms: ", end - start)
+        start = time.time()
+        childmodel = slow_model_structure_transformation(
+            parentmodel, childmodel_info, node_to_node_mapping
+        )
+        childmodel.load_weights("save_weights.h5")
+        end = time.time()
+        print("Transformation time in slow computing algorithms: ", end - start)
 
-parentModel = tf.keras.models.load_model("/data/vgg16.h5")
-childModel = tf.keras.models.load_model("/data/vgg19.h5")
-childmodel_info = build_childmodel_info(childModel)
-start = time.time()
-node_to_node_mapping = compute_node_to_node_mapping(parentModel, childModel)
-end = time.time()
-print("Time for rapid computing algorithms (Ours): ", end - start)
-start = time.time()
-childModel = model_structure_transformation(
-    parentModel, childmodel_info, node_to_node_mapping
-)
-childModel.load_weights(r"save_weights.h5")
-end = time.time()
-print("Transformation time in rapid computing algorithms (Ours): ", end - start)
 
-parentModel = tf.keras.models.load_model("/data/vgg16.h5")
-childModel = tf.keras.models.load_model("/data/resnet50.h5")
-childModel.save_weights(r"save_weights.h5")
-childmodel_info = build_childmodel_info(childModel)
+def test_rapid():
+    rapid_test_list = [
+        [
+            # tf.keras.applications.VGG16(weights="imagenet"),
+            # tf.keras.applications.VGG19(weights="imagenet"),
+            tf.keras.models.load_model("/data/vgg16.h5"),
+            tf.keras.models.load_model("/data/vgg19.h5"),
+        ],
+        [
+            # tf.keras.applications.VGG16(weights="imagenet"),
+            # tf.keras.applications.ResNet50(weights="imagenet"),
+            tf.keras.models.load_model("/data/vgg16.h5"),
+            tf.keras.models.load_model("/data/resnet50.h5"),
+        ],
+        [
+            # tf.keras.applications.ResNet50(weights="imagenet"),
+            # tf.keras.applications.VGG19(weights="imagenet"),
+            tf.keras.models.load_model("/data/resnet50.h5"),
+            tf.keras.models.load_model("/data/vgg19.h5"),
+        ],
+    ]
+    for model_pair in rapid_test_list:
+        parentmodel = model_pair[0]
+        childmodel = model_pair[1]
+        parentmodel_info = build_childmodel_info(model_pair[0])
+        childmodel_info = build_childmodel_info(model_pair[1])
+        childmodel.save_weights("save_weights.h5")
+        start = time.time()
+        node_to_node_mapping = compute_node_to_node_mapping(parentmodel, childmodel)
+        end = time.time()
+        print("Time for rapid computing algorithms (Ours): ", end - start)
 
-start = time.time()
-cost_matrix = build_cost_matrix(parentModel, childModel, add_operations_time)
-node_to_node_mapping = munkres(cost_matrix)
-end = time.time()
-print("Time for slow computing algorithms (Munkres): ", end - start)
-start = time.time()
-childModel = slow_model_structure_transformation(
-    parentModel, childmodel_info, node_to_node_mapping
-)
-childModel.load_weights(r"save_weights.h5")
-end = time.time()
-print("Transformation time in slow computing algorithms: ", end - start)
+        start = time.time()
+        childModel = model_structure_transformation(
+            parentmodel, childmodel_info, node_to_node_mapping
+        )
+        childModel.load_weights("save_weights.h5")
+        end = time.time()
+        print("Transformation time in rapid computing algorithms (Ours): ", end - start)
 
-parentModel = tf.keras.models.load_model("/data/vgg16.h5")
-childModel = tf.keras.models.load_model("/data/resnet50.h5")
-childmodel_info = build_childmodel_info(childModel)
-start = time.time()
-node_to_node_mapping = compute_node_to_node_mapping(parentModel, childModel)
-end = time.time()
-print("Time for rapid computing algorithms (Ours): ", end - start)
-start = time.time()
-childModel = model_structure_transformation(
-    parentModel, childmodel_info, node_to_node_mapping
-)
-childModel.load_weights(r"save_weights.h5")
-end = time.time()
-print("Transformation time in rapid computing algorithms (Ours): ", end - start)
 
-parentModel = tf.keras.models.load_model("/data/resnet50.h5")
-childModel = tf.keras.models.load_model("/data/vgg19.h5")
-childModel.save_weights(r"save_weights.h5")
-childmodel_info = build_childmodel_info(childModel)
+def test():
+    test_slow()
+    test_rapid()
 
-start = time.time()
-cost_matrix = build_cost_matrix(parentModel, childModel, add_operations_time)
-node_to_node_mapping = munkres(cost_matrix)
-end = time.time()
-print("Time for slow computing algorithms (Munkres): ", end - start)
-start = time.time()
-childModel = slow_model_structure_transformation(
-    parentModel, childmodel_info, node_to_node_mapping
-)
-childModel.load_weights(r"save_weights.h5")
-end = time.time()
-print("Transformation time in slow computing algorithms: ", end - start)
 
-parentModel = tf.keras.models.load_model("/data/resnet50.h5")
-childModel = tf.keras.models.load_model("/data/vgg19.h5")
-childmodel_info = build_childmodel_info(childModel)
-start = time.time()
-node_to_node_mapping = compute_node_to_node_mapping(parentModel, childModel)
-end = time.time()
-print("Time for rapid computing algorithms (Ours): ", end - start)
-start = time.time()
-childModel = model_structure_transformation(
-    parentModel, childmodel_info, node_to_node_mapping
-)
-childModel.load_weights(r"save_weights.h5")
-end = time.time()
-print("Transformation time in rapid computing algorithms (Ours): ", end - start)
+test()

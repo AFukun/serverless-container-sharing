@@ -16,6 +16,7 @@ with open("imgclsmob_models.json") as file:
 with open("nasbench_models.json") as file:
     nasbench_model_graphs = json.load(file)
 
+
 if __name__ == "__main__":
     # utils.gen_model_data(args.data_dir, test_model_list)
     # utils.gen_nasbench_model_data(
