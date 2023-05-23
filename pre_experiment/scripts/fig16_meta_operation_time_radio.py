@@ -279,34 +279,60 @@ def transform_by_layer_info(layer, layer_info):
         layer.alpha = layer_info["layer_alpha"]
 
 
-def swap_node_location(
-    parentmodel_layers,
-    node_to_node_mapping,
-    model_info,
-    model,
-    parentmodel_layers_length,
-    meta_operations_total_execute_time,
-):
+# def swap_node_location(
+#     parentmodel_layers,
+#     node_to_node_mapping,
+#     model_info,
+#     model,
+#     parentmodel_layers_length,
+#     meta_operations_total_execute_time,
+# ):
+#     child_layers_length = len(model_info)
+#     child_layers = [[] for _ in range(child_layers_length)]
+#     Add_index = 0
+#     start = time.time()
+#     for _, mapping in enumerate(node_to_node_mapping):
+#         if mapping[1] < child_layers_length:
+#             if mapping[0] < parentmodel_layers_length:
+#                 child_layers[mapping[1]] = parentmodel_layers[mapping[0]]
+#             else:
+#                 child_layers[mapping[1]] = parentmodel_layers[
+#                     parentmodel_layers_length + Add_index
+#                 ]
+#                 Add_index += 1
+#     end = time.time()
+#     meta_operations_total_execute_time["fail_time"] = end - start
+#     childmodel = generate_edge(
+#         model, child_layers, model_info, meta_operations_total_execute_time
+#     )
+#     return childmodel
+
+def swap_node_location(parentmodel_layers, node_to_node_mapping, model_info, model, parentmodel_layers_length, meta_operations_total_execute_time):
     child_layers_length = len(model_info)
     child_layers = [[] for _ in range(child_layers_length)]
     Add_index = 0
-    start = time.time()
+    count_success = 0
+    count_success_time = 0
     for _, mapping in enumerate(node_to_node_mapping):
         if mapping[1] < child_layers_length:
             if mapping[0] < parentmodel_layers_length:
+                count_success += 1
+                start = time.time()
                 child_layers[mapping[1]] = parentmodel_layers[mapping[0]]
+                end = time.time()
+                count_success_time += end - start
             else:
-                child_layers[mapping[1]] = parentmodel_layers[
-                    parentmodel_layers_length + Add_index
-                ]
+                child_layers[mapping[1]] = parentmodel_layers[parentmodel_layers_length + Add_index]
                 Add_index += 1
-    end = time.time()
-    meta_operations_total_execute_time["fail_time"] = end - start
-    childmodel = generate_edge(
-        model, child_layers, model_info, meta_operations_total_execute_time
-    )
-    return childmodel
 
+    if count_success > 0:
+        average_fail_time = count_success_time / count_success
+    else:
+        average_fail_time = 0
+    meta_operations_total_execute_time['fail_time'] = average_fail_time * (parentmodel_layers_length - count_success)
+
+    childmodel = generate_edge(model, child_layers, model_info, meta_operations_total_execute_time)
+    return childmodel
 
 def model_structure_transformation(
     parentModel, childmodel_info, node_to_node_mapping, weight_path
