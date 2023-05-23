@@ -4,3 +4,4 @@ __pycache__/
 tmp/
 local_test.py
 output*
+save_weights.h5

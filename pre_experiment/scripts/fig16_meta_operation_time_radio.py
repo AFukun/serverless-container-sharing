@@ -307,7 +307,15 @@ def transform_by_layer_info(layer, layer_info):
 #     )
 #     return childmodel
 
-def swap_node_location(parentmodel_layers, node_to_node_mapping, model_info, model, parentmodel_layers_length, meta_operations_total_execute_time):
+
+def swap_node_location(
+    parentmodel_layers,
+    node_to_node_mapping,
+    model_info,
+    model,
+    parentmodel_layers_length,
+    meta_operations_total_execute_time,
+):
     child_layers_length = len(model_info)
     child_layers = [[] for _ in range(child_layers_length)]
     Add_index = 0
@@ -322,17 +330,24 @@ def swap_node_location(parentmodel_layers, node_to_node_mapping, model_info, mod
                 end = time.time()
                 count_success_time += end - start
             else:
-                child_layers[mapping[1]] = parentmodel_layers[parentmodel_layers_length + Add_index]
+                child_layers[mapping[1]] = parentmodel_layers[
+                    parentmodel_layers_length + Add_index
+                ]
                 Add_index += 1
 
     if count_success > 0:
         average_fail_time = count_success_time / count_success
     else:
         average_fail_time = 0
-    meta_operations_total_execute_time['fail_time'] = average_fail_time * (parentmodel_layers_length - count_success)
+    meta_operations_total_execute_time["fail_time"] = average_fail_time * (
+        parentmodel_layers_length - count_success
+    )
 
-    childmodel = generate_edge(model, child_layers, model_info, meta_operations_total_execute_time)
+    childmodel = generate_edge(
+        model, child_layers, model_info, meta_operations_total_execute_time
+    )
     return childmodel
+
 
 def model_structure_transformation(
     parentModel, childmodel_info, node_to_node_mapping, weight_path
@@ -488,10 +503,10 @@ def model_structure_transformation(
 from save_information import build_childmodel_info, compute_node_to_node_mapping
 
 weight_path = "save_weights.h5"
-# parentModel = tf.keras.models.load_model("/data/resnet50.h5")
-# childModel = tf.keras.models.load_model("/data/resnet101.h5")
-parentModel = tf.keras.applications.ResNet50(weights="imagenet")
-childModel = tf.keras.applications.ResNet101(weights="imagenet")
+parentModel = tf.keras.models.load_model("/data/resnet50.h5")
+childModel = tf.keras.models.load_model("/data/resnet101.h5")
+# parentModel = tf.keras.applications.ResNet50(weights="imagenet")
+# childModel = tf.keras.applications.ResNet101(weights="imagenet")
 childModel.save_weights(weight_path)
 childmodel_info = build_childmodel_info(childModel)
 fast_node_to_node_mapping = compute_node_to_node_mapping(parentModel, childModel)
@@ -500,10 +515,10 @@ childModel = model_structure_transformation(
 )
 
 weight_path = "save_weights.h5"
-# parentModel = tf.keras.models.load_model("/data/resnet101.h5")
-# childModel = tf.keras.models.load_model("/data/resnet50.h5")
-parentModel = tf.keras.applications.ResNet101(weights="imagenet")
-childModel = tf.keras.applications.ResNet50(weights="imagenet")
+parentModel = tf.keras.models.load_model("/data/resnet101.h5")
+childModel = tf.keras.models.load_model("/data/resnet50.h5")
+# parentModel = tf.keras.applications.ResNet101(weights="imagenet")
+# childModel = tf.keras.applications.ResNet50(weights="imagenet")
 childModel.save_weights(weight_path)
 childmodel_info = build_childmodel_info(childModel)
 fast_node_to_node_mapping = compute_node_to_node_mapping(parentModel, childModel)
@@ -512,10 +527,10 @@ childModel = model_structure_transformation(
 )
 
 weight_path = "save_weights.h5"
-# parentModel = tf.keras.models.load_model("/data/resnet50.h5")
-# childModel = tf.keras.models.load_model("/data/vgg19.h5")
-parentModel = tf.keras.applications.ResNet50(weights="imagenet")
-childModel = tf.keras.applications.VGG19(weights="imagenet")
+parentModel = tf.keras.models.load_model("/data/resnet50.h5")
+childModel = tf.keras.models.load_model("/data/vgg19.h5")
+# parentModel = tf.keras.applications.ResNet50(weights="imagenet")
+# childModel = tf.keras.applications.VGG19(weights="imagenet")
 childModel.save_weights(weight_path)
 childmodel_info = build_childmodel_info(childModel)
 fast_node_to_node_mapping = compute_node_to_node_mapping(parentModel, childModel)
