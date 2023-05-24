@@ -474,8 +474,8 @@ def record_data(file_name, meta_operation_type, record):
             writer.writerow(_)
 
 
-model = tf.keras.applications.ResNet50(weights="imagenet")
-# model = tf.keras.models.load_model("/data/resnet50.h5")
+# model = tf.keras.applications.ResNet50(weights="imagenet")
+model = tf.keras.models.load_model("/data/resnet50.h5", compile=False)
 model_info = build_childmodel_info(model)
 record = test_resnet50_diverse_operation_load_time(model, model_info)
 record_data("fig4_loading_latency_for_varing_operations.csv", "load_time", record)
